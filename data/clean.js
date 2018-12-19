@@ -7,7 +7,7 @@ let output_dir = "output/";
 let last;
 let width = 500,
     height = 500;
-
+let datasetSize = 40;
 let y = d3.scaleLinear()
     .rangeRound([0, width]);
 
@@ -87,7 +87,7 @@ module.exports = function (pieData, outputLocation) {
         });
     }
 
-    d3.range(10).map(function (d, i) {
+    d3.range(datasetSize).map(function (d, i) {
         
      /*  let offx =Math.floor(Math.random() * Math.floor(60))+20 ;
        let offy =Math.floor(Math.random() * Math.floor(60))+20 ;

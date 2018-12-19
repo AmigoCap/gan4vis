@@ -6,7 +6,7 @@ var output_dir = "output/";
 
 var width = 500,
     height = 500;
-
+let datasetSize = 40;
 var x = d3.scaleLinear()
     .rangeRound([0, width]);
 
@@ -44,7 +44,7 @@ module.exports = function (pieData, outputLocation) {
         .mode("vertical");
 
 
-    d3.range(1).map(function (d, i) {
+    d3.range(datasetSize).map(function (d, i) {
 
 
         // timeout to make sure the DOM has time to be refreshed

@@ -9,6 +9,7 @@ let last;
 let width = 500,
     height = 500;
 
+let datasetSize = 40;
 
 var x = d3.scaleLinear()
     .rangeRound([50, 500]).domain([0, 9]);
@@ -104,7 +105,7 @@ module.exports = function (pieData, outputLocation) {
     }
 
 
-    d3.range(5).map(function (d, i) {
+    d3.range(datasetSize).map(function (d, i) {
 
         let offx = Math.floor(Math.random() * Math.floor(200));
         let offy = Math.floor(Math.random() * Math.floor(200));
