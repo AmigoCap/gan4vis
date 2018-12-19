@@ -57,6 +57,13 @@ To generate a dataset, use the following command line.
 node vertical.js
 
 ```
+Some node packages may need to be installed as described in the following.
+
+``` sh 
+npm install d3
+
+```
+
 The outcome will be in the output folder.
 
 Parameters, such as the dataset size can be changed directly in the script.
