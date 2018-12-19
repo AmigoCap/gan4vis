@@ -3,8 +3,6 @@ let d3 = require('d3');
 let d3s = require('d3-shape');
 let rough = require('roughjs');
 let d3Gridding = require('d3-gridding');
-let Canvas = require('canvas')
-let xml = require('xmlserializer')
 let JSDOM = require('jsdom').JSDOM;
 let output_dir = "output/";
 let last;
@@ -40,8 +38,8 @@ let distributions = ["random", "d3.randomBates"];
 module.exports = function (pieData, outputLocation) {
 
     if (!outputLocation) outputLocation = 'grid.svg';
-    const window = (new JSDOM(`<html><head><script src="//roughjs.com/builds/rough.min.js"></script></head><body><canvas id="conv"></canvas></body></html>`, {pretendToBeVisual: true})).window;
-    var htmlToImage = require('html-to-image');
+    const window = (new JSDOM(`<html><head><script src="//roughjs.com/builds/rough.min.js"></script></head><body></body></html>`, {pretendToBeVisual: true})).window;
+
     window.d3 = d3.select(window.document);
 
     document = (window.document);
@@ -101,14 +99,12 @@ module.exports = function (pieData, outputLocation) {
 
 
         return bins.map(function (d) {
-                return d.length;
-            }
-        )
-            ;
+            return d.length;
+        });
     }
 
 
-    d3.range(20).map(function (d, i) {
+    d3.range(5).map(function (d, i) {
 
         let offx = Math.floor(Math.random() * Math.floor(200));
         let offy = Math.floor(Math.random() * Math.floor(200));
@@ -120,6 +116,10 @@ module.exports = function (pieData, outputLocation) {
 
             // cleaning up the DOM
             window.d3.selectAll("path").remove();
+            window.d3.selectAll(".square").remove();
+            window.d3.selectAll(".index").remove();
+            window.d3.selectAll(".arc").remove();
+            window.d3.selectAll("g").remove();
 
             // update the grid library with new data
 
@@ -150,24 +150,17 @@ module.exports = function (pieData, outputLocation) {
 
             griddingData.forEach(function (d, i) {
 
-                //hand drawn like style
                 sv.appendChild(rc.rectangle(d.x + 30, d.y + 30, d.width, d.height, {roughness: temprng(0, 0.6), strokeWidth: 3}));
             })
 
 
-            fs.writeFileSync(__dirname + '/' + output_dir + "fill_color" + i + ".jpg", svgToCanvas(svg, window));
-
-
-            //fs.writeFileSync(__dirname + '/' + output_dir + "fill_color" + i + ".svg", window.d3.select('.container').html());
-
+            fs.writeFileSync(__dirname + '/' + output_dir + "line_label" + (i) + ".svg", window.d3.select('.container').html());
 
             window.d3.selectAll("path").remove();
 
 
             let t = get_rng();
 
-
-            // Draw the line chart
             svg.append("path")
                 .datum(griddingData)
                 .attr("fill", "none")
@@ -178,8 +171,8 @@ module.exports = function (pieData, outputLocation) {
                 .attr("d", line);
 
 
-            //save it
-            fs.writeFileSync(__dirname + '/' + output_dir + "fill" + i + ".svg", window.d3.select('.container').html())
+
+            fs.writeFileSync(__dirname + '/' + output_dir + "line" + (i) + ".svg", window.d3.select('.container').html())
         }, 500);
     });
 };
@@ -206,32 +199,3 @@ function temprng(a, b) {
 
     return a + (b - a) * (1 - Math.sqrt(Math.random() * Math.floor(1)))
 }
-
-
-function svgToCanvas(svg, window) {
-    // Select the first svg element
-
-    console.log('dasdasdsa');
-    img = new Canvas.Image(),
-        serializer = xml
-    //svgStr = serializer.serializeToString();
-
-    img.src = 'data:image/svg+xml;base64,' + window.btoa(svg.node());
-    console.log(svg);
-    img.onload = function () {
-        var canvas = document.createElement("canvas");
-        document.body.appendChild(canvas);
-        console.log(img.src+'---');
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-        // Now save as png or whatever
-        return '<img src="' + canvas.toDataURL("image/jpg") + '">';
-    }
-
-
-    // You could also use the actual string without base64 encoding it:
-    //img.src = "data:image/svg+xml;utf8," + svgStr;
-
-
-};

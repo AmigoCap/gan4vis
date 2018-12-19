@@ -13,7 +13,7 @@ def getfilext(path):
         ext = os.path.splitext(f)[1]  # reverse search of '.' and send it. If no '.', send empty String
         if ext.lower() not in file:
             continue
-        if 'color' not in f:
+        if 'label' not in f:
             files.append(f)
 
     return files
@@ -21,7 +21,7 @@ def getfilext(path):
 
 def combine(name, nb):
     dior = ['res/test/', 'res/val/', 'res/train/']
-    images = map(Image.open, ['output/' + re.sub(r'([A-z]+)', r'\1_color', name)[:-6], 'output/' + name])
+    images = map(Image.open, ['output/' + re.sub(r'([A-z]+)', r'\1_label', name)[:-6], 'output/' + name])
     # images = map(Image.open, ['output/' + re.sub(r'([A-z]+)', 'vertical_color', name)[:-15]+'.jpg', 'output/' + name])
 
     total_width = 1000

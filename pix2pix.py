@@ -30,7 +30,7 @@ parser.add_argument('--img_height', type=int, default=256, help='size of image h
 parser.add_argument('--img_width', type=int, default=256, help='size of image width')
 parser.add_argument('--channels', type=int, default=3, help='number of image channels')
 parser.add_argument('--sample_interval', type=int, default=20, help='interval between sampling of images from generators')
-parser.add_argument('--checkpoint_interval', type=int, default=2, help='interval between model checkpoints')
+parser.add_argument('--checkpoint_interval', type=int, default=500, help='interval between model checkpoints')
 opt = parser.parse_args()
 
 os.makedirs('log/images/%s' % opt.dataset_name, exist_ok=True)
@@ -73,10 +73,10 @@ else:
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 
-dataloader = DataLoader(ImageDataset("../data/%s" % opt.dataset_name),
+dataloader = DataLoader(ImageDataset("data/%s" % opt.dataset_name),
                         batch_size=opt.batch_size, shuffle=True, num_workers=opt.n_cpu)
 
-val_dataloader = DataLoader(ImageDataset("../data/%s" % opt.dataset_name, mode='val'),
+val_dataloader = DataLoader(ImageDataset("data/%s" % opt.dataset_name, mode='val'),
                             batch_size=opt.batch_size, shuffle=True, num_workers=opt.n_cpu)
 
 # Tensor type
@@ -181,20 +181,6 @@ for epoch in range(opt.epoch, opt.n_epochs):
         # If at sample interval save image
         if batches_done % opt.sample_interval == 0:
             sample_images(batches_done)
-            temp = float(loss_D.data.cpu().numpy())
-            discs.append(temp)
-            temp = float(loss_G.data.cpu().numpy())
-            gens.append(temp)
-
-            loss_D.cuda()
-            loss_G.cuda()
-
-            print(temp)
-            with open('log/train/gens.json', 'w') as f:
-                f.write(ujson.dumps(discs))
-
-            with open('log/train/disc.json', 'w') as f:
-                f.write(ujson.dumps(gens))
 
     if opt.checkpoint_interval != -1 and epoch % opt.checkpoint_interval == 0:
         # Save model checkpoints
