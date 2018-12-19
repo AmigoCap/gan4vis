@@ -69,7 +69,7 @@ The outcome will be in the output folder.
 
 Parameters, such as the dataset size can be changed directly in the script.
 
-Once the SVGs are generated, they can be transform into JPGs (format that the GAN uses), using 'svgtojpg.sh' as it follows :
+Once the SVGs are generated, they can be transformed into JPGs (format that the GAN uses), using 'svgtojpg.sh' as it follows :
 ``` sh 
 ./svgtojpg.sh
 
