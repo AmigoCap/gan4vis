@@ -10,7 +10,7 @@ Pip requeriements are available in requirements.txt at the root of this reposito
 
 This file can be used as it follows :
 
-``` sh 
+``` sh
 pip3 install -r requirements.txt
 
 ```
@@ -29,17 +29,17 @@ Dataset1 architecture:
 ├── dataset1/ <br/>
 │   ├── train/ <br/>
 |   ├── test/ <br/>
-│   └── val/ <br/> 
+│   └── val/ <br/>
 
 The dataset folder must be present into the 'data' folder. Its name is latter used to start a training on it.
 
 
 ### Training
 
-Using the folowing command line will start a traning over the dataset: 'dataset1' 
+Using the folowing command line will start a traning over the dataset: 'dataset1'
 
-``` sh 
-python pix2pix.py --dataset_name 'dataset1' 
+``` sh
+python pix2pix.py --dataset_name 'dataset1'
 
 ```
 
@@ -53,15 +53,17 @@ Dataset can be generated using node js scripts like 'vertical.js' in data folder
 
 To generate a dataset, use the following command line.
 
-``` sh 
+``` sh
 node vertical.js
 
 ```
 
 Some node packages may need to be installed as described in the following.
 
-``` sh 
+``` sh
 npm install d3
+npm install d3-gridding
+npm install jsdom
 
 ```
 
@@ -70,7 +72,7 @@ The outcome will be in the output folder.
 Parameters, such as the dataset size can be changed directly in the script.
 
 Once the SVGs are generated, they can be transformed into JPGs (format that the GAN uses), using 'svgtojpg.sh' as it follows :
-``` sh 
+``` sh
 ./svgtojpg.sh
 
 ```
@@ -78,9 +80,8 @@ The outcome will be in the output folder.
 
 Finally, labels and inputs are concatened and formatted as the model expects using the python script 'preprocess.py'
 
-``` sh 
+``` sh
 python preprocess.py
 
 ```
 The outcome will be in the 'res' folder.
-
