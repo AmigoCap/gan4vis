@@ -76,6 +76,13 @@ Once the SVGs are generated, they can be transformed into JPGs (format that the 
 ./svgtojpg.sh
 
 ```
+Some node packages may need to be installed as described in the following.
+
+``` sh
+brew install ImageMagick
+
+```
+
 The outcome will be in the output folder.
 
 Finally, labels and inputs are concatened and formatted as the model expects using the python script 'preprocess.py'
