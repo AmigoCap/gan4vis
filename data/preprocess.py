@@ -6,6 +6,9 @@ from tqdm import trange
 
 
 def getfilext(path):
+    """Retrieve all images in folder and subfolders
+    Input: general path to a folder
+    Output: list of images paths"""
     files = []
     file = [".jpg"]
 
@@ -20,6 +23,15 @@ def getfilext(path):
 
 
 def combine(name, nb):
+    """ Combine two images into one image.
+    Left side will be the image with label in its name (output image of the model)
+    and right side will be the input image.
+    Input: "name" = name of the image
+           "nb" = int between 0 and 2 which will store the output in the folder
+           test, val or train
+    Output: The combined image store in the selected folder with the name given
+            input.
+    """
     dior = ['res/test/', 'res/val/', 'res/train/']
     images = map(Image.open, ['output/' + re.sub(r'([A-z]+)', r'\1_label', name)[:-6], 'output/' + name])
     # images = map(Image.open, ['output/' + re.sub(r'([A-z]+)', 'vertical_color', name)[:-15]+'.jpg', 'output/' + name])
@@ -38,6 +50,9 @@ def combine(name, nb):
 
 
 def main():
+    """ Select all images in the output folder and create a combination of the
+    matching ones. Spread equally in the folders train, val and test.
+    """
     os.makedirs('res', exist_ok=True)
     os.makedirs('res/train', exist_ok=True)
     os.makedirs('res/val', exist_ok=True)
