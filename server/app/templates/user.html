@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+	<table>
+		<tr valing="top">
+			<td><img src="{{ user.avatar(128) }}"></td>
+			<td><h1>User : {{ user.username }}</h1></td>
+		</tr>
+	</table>
+	<hr />
+	<div class="row" style="">
+		<table class="table table-striped" style="justify-content: center;">
+			<thead>
+				<tr>
+					<th style="text-align: center;" scope="col">Sketch</th>
+					<th style="text-align: center;" scope="col">Prediction</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for task in tasks %}
+				<tr>
+					<td style="text-align: center;"><img src="{{ url_for('static', filename=task.input_sketch) }}"></td>
+					<td style="text-align: center;"><img src="{{ url_for('static', filename=task.output_pred) }}"></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}

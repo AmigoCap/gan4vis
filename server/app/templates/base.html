@@ -1,0 +1,65 @@
+{% extends "bootstrap/base.html" %}
+
+{% block styles %}
+	{{super()}}
+	<link rel="stylesheet" href="{{url_for('static', filename='styles/mainpage.css')}}">
+{% endblock %}
+
+{% block scripts %}
+	{{ super() }}
+	<script src="{{url_for('static', filename='scripts/activate_navbar_elems.js')}}"></script>
+	{% block app_scripts %}{% endblock %}
+{% endblock %}
+
+{% block title %}
+	{% if title %}{{title}} - GAN4Vis{% else %}Welcome to the GAN4Vis website project!{% endif %}
+{% endblock %}
+
+{% block navbar %}
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="{{ url_for('index') }}">GAN 4 Vis</a>
+			</div>
+
+			<!--  Collect the nav links, forms, and other content for toggling -->
+			<div classe="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li id="home_link"><a href="{{ url_for('index') }}">Home</a></li>
+					{% if current_user.is_anonymous %}
+					<li><a href={{ url_for('login') }}>Login</a></li>
+					{% else %}
+					<li><a href={{ url_for('logout') }}>Logout</a></li>
+					<li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
+					{% endif %}
+					<li><a href="#">About us</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for message in messages %}
+			<div class="alert alert-danger" role="alert">
+				<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+				{{ message }}
+			</div>
+			{% endfor %}
+		{% endif %}
+		{% endwith %}
+	</div>
+	<div class="container" style="flex: 1;">
+		{% block app_content %}{% endblock %}
+	</div>
+
+{% endblock %}

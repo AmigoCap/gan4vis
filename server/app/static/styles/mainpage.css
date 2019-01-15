@@ -1,0 +1,6 @@
+/*Setting the right colors for the navigation bar*/
+.navbar-default .navbar-nav>.active> a, 
+.navbar-default .navbar-nav>.active> a:focus, 
+.navbar-default .navbar-nav>.active> a:hover {
+  color: #0099cc;
+}

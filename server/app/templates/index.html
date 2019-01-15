@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block app_scripts %}
+	{{ super() }}
+	<script src="{{url_for('static', filename='scripts/canvas_module.js')}}"></script>
+{% endblock %}
+
+{% block app_content %}
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<h1>GAN4Vis Project Homepage</h1>
+				<p>Hello, welcome to the GAN4Vis home page project! It is under construction but you can see some of the base features</p>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row" style="display: flex; justify-content: space-around; align-items: center; margin: 5px">
+			<div class="col" style="border: 1px solid grey; border-radius: 5px; justify-content: space-around;margin: 2px">
+				<p>Sketching area:</p>
+				<div id="canvasDivId"></div>
+			</div>
+			<div class="col" style="margin: 2px">
+				<form action="{{ url_for('index') }}" method="post" id="submitForm">
+					{{ form.submit_button() }}
+					{{ form.canvas_data() }}
+				</form>
+			</div>
+			<div class="col" style="border: 1px solid grey; border-radius: 5px; justify-content: space-around;margin: 2px">
+				<p>Result:</p>
+				<img src="{% if output_img %}{{output_img}}{% else %}{{ url_for('static', filename='img/result.jpg')}}{% endif %}" width="256" height="256" id="outputImageId"/>
+			</div>
+		</div>
+	</div>
+{% endblock %}

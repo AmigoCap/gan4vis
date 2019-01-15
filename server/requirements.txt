@@ -1,0 +1,10 @@
+# Conda requirements
+flask
+flask-sqlalchemy
+flask-wtf
+
+#Comment the following line if on conda
+#flask-migrate
+
+#Comment the following line if not on conda
+pytorch
