@@ -15,10 +15,10 @@
 		</div>
 	</div>
 	<div class="container">
-		<div class="row" style="display: flex; justify-content: space-around; align-items: center; margin: 5px">
+		<div class="row" style="display: flex; justify-content: space-around; align-items: center; margin: 5px;">
 			<div class="col" style="border: 1px solid grey; border-radius: 5px; justify-content: space-around;margin: 2px">
 				<p>Sketching area:</p>
-				<div id="canvasDivId"></div>
+				<div id="canvasDivId" width="256" height="256"></div>
 			</div>
 			<div class="col" style="margin: 2px">
 				<form action="{{ url_for('index') }}" method="post" id="submitForm">
@@ -26,9 +26,13 @@
 					{{ form.canvas_data() }}
 				</form>
 			</div>
-			<div class="col" style="border: 1px solid grey; border-radius: 5px; justify-content: space-around;margin: 2px">
+			<div class="col" style="border: 1px solid grey; border-radius: 5px; justify-content: space-around;margin: 2px;">
 				<p>Result:</p>
-				<img src="{% if output_img %}{{output_img}}{% else %}{{ url_for('static', filename='img/result.jpg')}}{% endif %}" width="256" height="256" id="outputImageId"/>
+				<div style="width: 256px; height: 256px;">
+					{% if output_img %}
+					<img src="{{ output_img }}" width="256" height="256" id="outputImageId"/>
+					{% endif %}
+				</div>
 			</div>
 		</div>
 	</div>
