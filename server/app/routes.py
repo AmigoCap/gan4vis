@@ -77,7 +77,7 @@ def index():
 			return render_template('index.html', title='Home', form=form, output_img=url_for('static', filename=output_filename))
 
 		else:
-			# Flash message for unsuccessful prediction
+			# Flash message for unsuccessful submission
 			pass
 		return render_template('index.html', title='Home', form=form, output_img=output_img_uri)
 
@@ -116,13 +116,6 @@ def user(username):
 	tasks = Task.query.filter_by(user_id=user.id).all()
 	print(tasks[0].input_sketch)
 	return render_template('user.html', user=user, tasks=tasks)
-
-@app.route('/my_posts')
-@login_required
-def my_posts():
-	posts = Post.query.filter_by(user_id=current_user.id).all()
-	print(posts)
-	return render_template('my_posts.html', title='My posts', posts=posts)
 
 
 @app.route('/register', methods=['GET','POST'])
