@@ -4,3 +4,7 @@
 .navbar-default .navbar-nav>.active> a:hover {
   color: #0099cc;
 }
+
+tr, th {
+	text-align: center;
+}
