@@ -1,1 +1,4 @@
 *.pth
+server/migrations
+server/app/static/db_files
+server/app/static/prediction_temp
