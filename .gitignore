@@ -6,4 +6,5 @@ server/app/static/prediction_temp
 *.png
 *.svg
 *.db
-
+*.pyc
+__pycache__
