@@ -74,6 +74,18 @@ function save_sketch()
 
 	form_canvas = document.getElementById("hiddenCanvasContentId");
 	form_canvas.value = canvas.toDataURL("image/png");
+
+	submit_button.classList.remove('btn-info');
+	submit_button.classList.add('btn-warning');
+	submit_button.innerHTML = " Loading..."
+
+	loader = document.createElement('span');
+	loader.classList.add('glyphicon');
+	loader.classList.add('glyphicon-refresh');
+	loader.classList.add('glyphicon-refresh-animate');
+
+	submit_button.insertBefore(loader, submit_button.childNodes[0])
+
 }
 
 submit_button = document.getElementById("saveSketchButtonId");
