@@ -51,7 +51,7 @@ sh svgtojpg.sh
 
 ### Preprocess
 
-Concaténer images de sortie et d'entrée sous la forme d'image (500x1000) en lançant le script pré-existant suivant.
+Concaténer images de sortie et d'entrée sous la forme d'image (1000x500) en lançant le script pré-existant suivant.
 
 ``` sh
 python3 preprocess.py
