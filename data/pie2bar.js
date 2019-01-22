@@ -16,7 +16,7 @@ var height = 500;
 var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 var outerRadius = width / 2;
-var innerRadius = 0;
+var innerRadius = outerRadius - 65; // set to 0 for full bar chart
 var arc = d3.arc()
     .innerRadius(innerRadius)
     .outerRadius(outerRadius);
@@ -70,7 +70,7 @@ module.exports = function(outputLocation) {
             }
 
 
-            var barPadding = 5;
+            var barPadding = 0;
             var barWidth = (width / dataset.length);
             var coeff = height/Math.max.apply(null, dataset);
 
@@ -85,9 +85,16 @@ module.exports = function(outputLocation) {
                     return d*coeff;
                 })
                 .attr("width", barWidth - barPadding)
-                .attr("fill", function(d, i){
-                    return color(i);
-                })
+// comment for colored charts
+                .attr("fill", "none")
+                .attr("stroke", "black")
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-width", 2)
+// uncomment for colored charts
+//                .attr("fill", function(d, i){
+//                    return color(i);
+//                })
                 .attr("transform", function (d, i) {
                      var translate = [barWidth * i, 0];
                      return "translate("+ translate +")";
@@ -104,13 +111,18 @@ module.exports = function(outputLocation) {
                 .enter()
                 .append("g")
                 .attr("class", "arc")
+                .style("fill", "none")
                 .attr("transform", "translate(" + width / 2 + ", " + height / 2 + ")");
 
             // Draw arc paths
             arcs.append("path")
-                .attr("fill", function(d, i){
-                    return color(i);
-                })
+// comment for colored charts
+                .attr("stroke", "black")
+                .attr("stroke-width", "2px")
+// uncomment for colored charts
+//                .attr("fill", function(d, i){
+//                    return color(i);
+//                })
                 .attr("d", arc);
 
 
