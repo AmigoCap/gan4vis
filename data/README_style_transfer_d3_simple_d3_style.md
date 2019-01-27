@@ -1,4 +1,4 @@
-# gan4vis - Style Transfer Matplotlib - D3
+# gan4vis - Style Transfer D3 - D3 with style
 
 ## Style Transfer Database
 
