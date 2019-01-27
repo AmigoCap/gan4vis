@@ -8,7 +8,7 @@ parser.add_argument('--number_barcharts', type=int, default=10, help='number of 
 opt = parser.parse_args()
 
 # X ticks used in the future bar charts
-letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
 # Number of images that we want to generate from the data that will be generated
 number_images = opt.number_barcharts
