@@ -3,6 +3,7 @@ server/migrations
 server/app/static/db_files
 server/app/static/prediction_temp
 server/gan4vis_heroku_virtual_env
+data/node_modules
 *.jpg
 *.png
 *.svg
