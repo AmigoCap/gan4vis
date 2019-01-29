@@ -1,4 +1,4 @@
-# gan4vis - Style Transfer D3 - D3 with style
+# gan4vis - Style Transfer D3 - Rough
 
 ## Style Transfer Database
 
