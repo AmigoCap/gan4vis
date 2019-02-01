@@ -26,7 +26,8 @@ def index():
 
 		# Récupération du sketch au format png
 		output_img_uri = request.form['canvas_data']
-		binary_data = a2b_base64(output_img_uri.split('base64,')[1])
+		b64_input_sketch = output_img_uri.split('base64,')[1]
+		binary_input_sketch = a2b_base64(b64_input_sketch)
 
 		static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static')
 
@@ -47,30 +48,26 @@ def index():
 
 			db.session.commit()
 
-		else:
+			# On Windows, os.path.join joint with \, must be changed when parsed to URL
+			output_filename = output_path.replace("\\","/")
 
-			token = str(uuid.uuid4())
+			# Écriture du sketch sur le serveur au format png 
+			fd = open(os.path.join(static_dir, input_path), 'wb')
+			fd.write(binary_input_sketch)
+			fd.close()
 
-			input_path = os.path.join('prediction_temp', token + '_sk.png')
-			output_path = os.path.join('prediction_temp', token + '_pr.png')
+			# Calling prediction module
+			pred_success = pred_one_img.predict_from_file(static_dir, input_path, output_path)
 
-		# On Windows, os.path.join joint with \, must be changed when parsed to URL
-		output_filename = output_path.replace("\\","/")
-
-		# Écriture du sketch sur le serveur au format png 
-		fd = open(os.path.join(static_dir, input_path), 'wb')
-		fd.write(binary_data)
-		fd.close()
-
-		# Appel du modèle et génération de l'image
-		if pred_one_img.main(static_dir, input_path, output_path) == 0:
-			print(output_path)
-			return render_template('index.html', title='Home', form=form, output_img=url_for('static', filename=output_filename))
+			output_img_src = url_for('static', filename=output_filename)
 
 		else:
-			# Flash message for unsuccessful submission
-			pass
-		return render_template('index.html', title='Home', form=form, output_img=output_img_uri)
+
+			# Calling prediction module
+			output_img_src = pred_one_img.predict_temp(b64_input_sketch)
+			print(output_img_src)
+
+		return render_template('index.html', title='Home', form=form, output_img=output_img_src)
 
 	return render_template('index.html', title='Home', form=form)
 
