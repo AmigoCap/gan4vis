@@ -69,25 +69,25 @@ for (var i = 0; i < Object.keys(plot_data).length; i++) {
       margin.top + yScale(d.value),
       xScale.bandwidth(),
       height - yScale(d.value), {
-        roughness: 1.5,
+        roughness: 100,
         fill: color(i),
         fillStyle: "zigzag",
-        fillWeight: 3,
-        hachureGap: 10
+        fillWeight: 1,
+        // hachureGap: 10
       }
     );
     window.document.getElementById('svg').appendChild(node);
   });
 
-  svg.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(" + (margin.left) + "," + (height + margin.top) + ")")
-    .call(xAxis)
-
-  svg.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(" + (margin.left) + "," + (margin.top) + ")")
-    .call(yAxis)
+  // svg.append("g")
+  //   .attr("class", "axis")
+  //   .attr("transform", "translate(" + (margin.left) + "," + (height + margin.top) + ")")
+  //   .call(xAxis)
+  //
+  // svg.append("g")
+  //   .attr("class", "axis")
+  //   .attr("transform", "translate(" + (margin.left) + "," + (margin.top) + ")")
+  //   .call(yAxis)
 
   fs.writeFileSync("output/barchart_label" + i + ".svg", window.d3.select('.container').html());
 }
