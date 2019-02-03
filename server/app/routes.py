@@ -6,6 +6,7 @@ from app.models import User, Task
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.urls import url_parse
 from binascii import a2b_base64
+# from cairosvg import svg2png
 import os
 import uuid
 
@@ -19,77 +20,75 @@ def root_page():
 # Defining the homepage view
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    # form = ImageSubmitForm()
+    #
+    # if request.method == 'POST':
+    #     print(1)
 
-    form = ImageSubmitForm()
-
-    if request.method == 'POST':
-
-        # Récupération du sketch au format png
-        output_img_uri = request.form['canvas_data']
-        print(output_img_uri)
-        binary_data = a2b_base64(output_img_uri.split('base64,')[1])
-        print(binary_data)
-
-        static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static')
-
-        print(static_dir)
-
-        # If user is logged in, creation of the db entry
-        if current_user.is_authenticated:
-
-            task = Task(user_id=current_user.id)
-            db.session.add(task)
-            db.session.commit()
-
-            task_id = str(task.id)
-
-            input_path = os.path.join('db_files','input_sketches', task_id + '_sk.png')
-            output_path = os.path.join('db_files','output_predictions', task_id + '_pr.png')
-
-            task.set_input_path(input_path)
-            task.set_output_path(output_path)
-
-            db.session.commit()
-
-        else:
-
-            token = str(uuid.uuid4())
-
-            input_path = os.path.join('prediction_temp', token + '_sk.png')
-            output_path = os.path.join('prediction_temp', token + '_pr.png')
-
-        # On Windows, os.path.join joint with \, must be changed when parsed to URL
-        output_filename = output_path.replace("\\","/")
-
-        print()
-        print('static_dir :',static_dir)
-        print('input_path :',input_path)
-        print(os.path.join(static_dir, input_path))
-
-<<<<<<< Updated upstream
-		else:
-			# Flash message for unsuccessful submission
-			pass
-		return render_template('index.html', title='Home', form=form, output_img=output_img_uri)
-=======
-        # Écriture du sketch sur le serveur au format png
-        fd = open(os.path.join(static_dir, input_path), 'wb')
-        fd.write(binary_data)
-        fd.close()
->>>>>>> Stashed changes
-
-        # Appel du modèle et génération de l'image
-        if pred_one_img.main(static_dir, input_path, output_path) == 0:
-            print(output_path)
-            return render_template('index.html', title='Home', form=form, output_img=url_for('static', filename=output_filename))
-
-        else:
-            # Flash message for unsuccessful prediction
-            pass
-        return render_template('index.html', title='Home', form=form, output_img=output_img_uri)
-
-    return render_template('index.html', title='Home', form=form)
-
+#         # Récupération du sketch au format png
+#         output_img_uri = request.form['canvas_data']
+#         print(output_img_uri)
+#         binary_data = a2b_base64(output_img_uri.split('base64,')[1])
+#         print(binary_data)
+#
+#         static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static')
+#
+#         print(static_dir)
+#
+#         # If user is logged in, creation of the db entry
+#         if current_user.is_authenticated:
+#
+#             task = Task(user_id=current_user.id)
+#             db.session.add(task)
+#             db.session.commit()
+#
+#             task_id = str(task.id)
+#
+#             input_path = os.path.join('db_files','input_sketches', task_id + '_sk.png')
+#             output_path = os.path.join('db_files','output_predictions', task_id + '_pr.png')
+#
+#             task.set_input_path(input_path)
+#             task.set_output_path(output_path)
+#
+#             db.session.commit()
+#
+#         else:
+#
+#             token = str(uuid.uuid4())
+#
+#             input_path = os.path.join('prediction_temp', token + '_sk.png')
+#             output_path = os.path.join('prediction_temp', token + '_pr.png')
+#
+#         # On Windows, os.path.join joint with \, must be changed when parsed to URL
+#         output_filename = output_path.replace("\\","/")
+#
+#         print()
+#         print('static_dir :',static_dir)
+#         print('input_path :',input_path)
+#         print(os.path.join(static_dir, input_path))
+#
+# # <<<<<<< Updated upstream
+# # 		else:
+# 			# Flash message for unsuccessful submission
+# 			# pass
+# 		#return render_template('index.html', title='Home', form=form, output_img=output_img_uri)
+# # =======
+#         # Écriture du sketch sur le serveur au format png
+#         fd = open(os.path.join(static_dir, input_path), 'wb')
+#         fd.write(binary_data)
+#         fd.close()
+# # >>>>>>> Stashed changes
+#
+#         # Appel du modèle et génération de l'image
+#         if pred_one_img.main(static_dir, input_path, output_path) == 0:
+#             print(output_path)
+#             return render_template('index.html', title='Home', form=form, output_img=url_for('static', filename=output_filename))
+#
+#         else:
+#             # Flash message for unsuccessful prediction
+#             pass
+        # return render_template('index.html', title='Home', form=form, output_img=output_img_uri)
+    return render_template('index.html', title='Home')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -108,6 +107,14 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
+@app.route('/treatment', methods=['GET','POST'])
+def treatment():
+    binary_data = a2b_base64(request.get_json()['image'].split('base64,')[1])
+    token = str(uuid.uuid4())
+    fd = open('./app/static/images_input/'+token+'.png', 'wb')
+    fd.write(binary_data)
+    fd.close()
+    return('POLOLO')
 
 @app.route('/logout')
 def logout():
@@ -124,8 +131,8 @@ def user(username):
     print(tasks[0].input_sketch)
     return render_template('user.html', user=user, tasks=tasks)
 
-<<<<<<< Updated upstream
-=======
+#<<<<<<< Updated upstream
+#=======
 @app.route('/my_posts')
 @login_required
 def my_posts():
@@ -133,7 +140,7 @@ def my_posts():
     print(posts)
     return render_template('my_posts.html', title='My posts', posts=posts)
 
->>>>>>> Stashed changes
+#>>>>>>> Stashed changes
 
 @app.route('/register', methods=['GET','POST'])
 def register():
