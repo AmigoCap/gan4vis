@@ -4,17 +4,16 @@
 
 L'interface est actuellement divisée en trois parties :
 
-![Architecture de la page](/index_explained.png)
-Format: ![Alt Text](url)
+![Architecture de la page](index_explained.png)
 
-### "charts"
+### id="charts"
 
 Le container "charts" abrite :
  - La zone "preview" permettant de visualiser en temps réel le chart qui va être soumis.
  - La zone "submission" contenant le bouton d'envoi du svg contenu dans "preview" vers le serveur.
  - La zone "result" contenant le résultat du transfert de style renvoyé par le serveur. Actuellement in contient uniquement un placeholder.
 
-### "selection"
+### id="selection"
 
 Le container "selection" abrite :
  - La zone "interface_keys" donnant à voir les commandes du clavier permettant de modifier le graphique de "preview".
@@ -31,8 +30,7 @@ Le container "selection" abrite :
 
 La requête AJAX active la fonction "treatment". Cette fonction vise à transformer l'information binaire provenant de "preview" en png sur le serveur.
 
-![Fonction treatment](/treatment_function.png)
-Format: ![Alt Text](url)
+![Fonction treatment](treatment_function.png)
 
 
 1. L'information de l'image est récupérée en données base64 depuis le JSON communiquée par la requête AJAX. Les données base64 sont alors transformées en données binaires.
