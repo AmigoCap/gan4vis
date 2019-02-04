@@ -230,13 +230,13 @@ function render_image() {
 
     var canvasUrl = canvas.toDataURL("image/png");
 
-    var img2 = d3.select('body').select("#render-final")
-      .node();
+    // var img2 = d3.select('body').select("#render-final")
+    //   .node();
 
     // this is now the base64 encoded version of our PNG! you could optionally
     // redirect the user to download the PNG by sending them to the url with
     // `window.location.href= canvasUrl`.
-    img2.src = canvasUrl;
+    // img2.src = canvasUrl;
     ajax_binary_image = canvasUrl
   }
 
