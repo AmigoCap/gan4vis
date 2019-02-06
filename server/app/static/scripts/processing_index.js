@@ -3,11 +3,12 @@ $("#apply_style_button").click(function() {
     url: "/treatment",
     type: "POST",
     data: JSON.stringify({
-      "image": ajax_binary_image
+      "image": ajax_binary_image, // Send the binary of the input chart image
+      "model": $("input:radio[name ='selection_model']:checked").val() // Send the chosen model
     }),
     contentType: "application/json; charset=utf-8",
     success: function(response) {
-      console.log(response);
+      $("#result_image").attr("src", "static/output-images/" + response) // Update the result image with the response
     }
   })
 });

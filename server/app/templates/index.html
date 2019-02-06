@@ -18,10 +18,10 @@
 		<input id="apply_style_button" class="btn btn-danger btn-lg" type="submit" value="Apply Style" style="height:50px;width:120px">
 	</div>
 	<div id="result" style="height:300px;float: right">
-		<img src="{{url_for('static', filename='images_utilitaries/placeholder.png')}}" width="450px" height="300px">
+		<img id="result_image" src="static/images_utilitaries/placeholder.png" width="450px" height="300px">
 	</div>
 </div>
-<div id="selection" class="container" style="width:100%; display: flex;justify-content: space-between">
+<div id="selection" class="container" style="width:100%; display: flex;justify-content: space-between; margin-top:5px">
 	<div id="interface_keys" style="width:450px; float: left; height:300px;">
 		<table style="width:100%; table-layout: fixed">
 			<tr>
@@ -60,23 +60,23 @@
 	<div id="interface_gans" style="width:450px; float: right; height:300px;">
 		<table style="width:100%; table-layout: fixed">
 			<tr>
-				<td style="width: 50%">
-					<img src="{{url_for('static', filename='images_utilitaries/placeholder.png')}}" width="40%">
-					<input type="radio" name="selection" value=0 style="width:15px" checked="checked">
+				<td style="width: 50%; padding-bottom: 5px">
+					<img src="static/style-images/mosaic.jpg" width="40%">
+					<input type="radio" name="selection_model" value="mosaic.pth" style="width:15px" checked="checked">
 				</td>
-				<td style="width: 50%">
-					<img src="{{url_for('static', filename='images_utilitaries/placeholder.png')}}" width="40%">
-					<input type="radio" name="selection" value=0 style="width:15px">
+				<td style="width: 50%; padding-bottom: 5px">
+					<img src="static/style-images/candy.jpg" width="40%">
+					<input type="radio" name="selection_model" value="candy.pth" style="width:15px">
 				</td>
 			</tr>
 			<tr>
 				<td style="width: 50%">
-					<img src="{{url_for('static', filename='images_utilitaries/placeholder.png')}}" width="40%">
-					<input type="radio" name="selection" value=0 style="width:15px">
+					<img src="static/style-images/rain-princess.jpg" width="40%">
+					<input type="radio" name="selection_model" value="rain_princess.pth" style="width:15px">
 				</td>
 				<td style="width: 50%">
-					<img src="{{url_for('static', filename='images_utilitaries/placeholder.png')}}" width="40%">
-					<input type="radio" name="selection" value=0 style="width:15px">
+					<img src="static/style-images/udnie.jpg" width="40%">
+					<input type="radio" name="selection_model" value="udnie.pth" style="width:15px">
 				</td>
 			</tr>
 		</table>

@@ -28,11 +28,4 @@ Le container "selection" abrite :
 
 ## Coté Serveur
 
-La requête AJAX active la fonction "treatment". Cette fonction vise à transformer l'information binaire provenant de "preview" en png sur le serveur.
-
-![Fonction treatment](treatment_function.png)
-
-
-1. L'information de l'image est récupérée en données base64 depuis le JSON communiquée par la requête AJAX. Les données base64 sont alors transformées en données binaires.
-2. Un token aléatoire est généré pour sauvegarder l'image sur le serveur.
-3. L'image est sauvagardée.
+La requête AJAX active la fonction "treatment". Cette fonction vise à transformer l'information binaire provenant de "preview" en png sur le serveur. La requête soumet aussi l'identifiant du modèle à appliquer.

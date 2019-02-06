@@ -7,9 +7,27 @@ from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.urls import url_parse
 from binascii import a2b_base64
 # from cairosvg import svg2png
-import os
+import os, sys, inspect
 import uuid
+from PIL import Image
 
+#
+
+ # realpath() will make your script run, even if you symlink it :)
+# cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
+# if cmd_folder not in sys.path:
+#     sys.path.insert(0, cmd_folder)
+#
+# print(cmd_folder)
+
+ # Use this if you want to include modules from a subfolder
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"gan")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
+
+from neural_style import *
+
+print(cmd_subfolder)
 
 # Redirect to the "index" page when going to route
 @app.route('/')
@@ -109,12 +127,33 @@ def login():
 
 @app.route('/treatment', methods=['GET','POST'])
 def treatment():
-    binary_data = a2b_base64(request.get_json()['image'].split('base64,')[1])
+    # Get the AJAX request and create the variable storing the data and the one storing the binary
+    dictionary_request = request.get_json()
+    binary_data = a2b_base64(dictionary_request['image'].split('base64,')[1])
+    model = dictionary_request['model']
+
+    # Save the image in png format using a random token
     token = str(uuid.uuid4())
-    fd = open('./app/static/images_input/'+token+'.png', 'wb')
+    fd = open('./app/static/content-images/'+token+'.png', 'wb')
     fd.write(binary_data)
     fd.close()
-    return('POLOLO')
+
+    # Load the image to remove the Alpha Channel
+    png = Image.open('./app/static/content-images/'+token+'.png')
+    png.load() # required for png.split()
+    background = Image.new("RGB", png.size, (255, 255, 255)) # Add a white background to the image
+    background.paste(png, mask=png.split()[3]) # 3 is the alpha channel
+    background.save('./app/static/content-images/'+token+'.jpg', 'JPEG', quality=80) # Save the image in the "static/content-images" directory
+
+    # Run the style transfer using the GAN chosen in model
+    main(content_image='./app/static/content-images/'+token+'.jpg',content_scale=None,output_image='./app/static/output-images/'+token+'.jpg',model="./app/gan/saved_models/"+model,cuda=0)
+
+    # Remove the input images
+    os.remove('./app/static/content-images/'+token+'.png')
+    os.remove('./app/static/content-images/'+token+'.jpg')
+
+    # The main saves the result in the "static/output-image/" directory. We post the name of the input (identical to the input) with AJAX
+    return(token+'.jpg')
 
 @app.route('/logout')
 def logout():
