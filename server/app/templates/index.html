@@ -1,39 +1,90 @@
 {% extends "base.html" %}
 
 {% block app_scripts %}
-	{{ super() }}
-	<script src="{{url_for('static', filename='scripts/canvas_module.js')}}"></script>
+{{ super() }}
+<!-- <script src="{{url_for('static', filename='scripts/canvas_module.js')}}"></script> -->
 {% endblock %}
 
 {% block app_content %}
-	<div class="container">
-		<div class="row">
-			<div class="col">
-				<h1>GAN4Vis Project Homepage</h1>
-				<p>Hello, welcome to the GAN4Vis home page project! It is under construction but you can see some of the base features</p>
-			</div>
-		</div>
+<div id="title" class="container" style="width:100%">
+	<div style="float: left; text-align:center;margin-bottom:40px; width: 100%">
+		<h1>GAN4VIS</h1>
+		<p>Create your chart and style it with a GAN!</p>
 	</div>
-	<div class="container">
-		<div class="row" style="display: flex; justify-content: space-around; align-items: center; margin: 5px;">
-			<div class="col" style="border: 1px solid grey; border-radius: 5px; justify-content: space-around;margin: 2px">
-				<p>Sketching area:</p>
-				<div id="canvasDivId" width="256" height="256"></div>
-			</div>
-			<div class="col" style="margin: 2px">
-				<form action="{{ url_for('index') }}" method="post" id="submitForm">
-					<button type="submit" class="btn btn-default" id="{{ form.submit_button.id }}">{{ form.submit_button.label }}</button>
-					{{ form.canvas_data() }}
-				</form>
-			</div>
-			<div class="col" style="border: 1px solid grey; border-radius: 5px; justify-content: space-around;margin: 2px;">
-				<p>Result:</p>
-				<div style="width: 256px; height: 256px;">
-					{% if output_img %}
-					<img src="{{ output_img }}" width="256" height="256" id="outputImageId"/>
-					{% endif %}
-				</div>
-			</div>
-		</div>
+</div>
+<div id="charts" class="container" style="width:100%; display: flex;justify-content: space-between">
+	<div id="preview" style="height:300px;float: left"></div>
+	<div id="submission" style=" height:300px; float:left;display: flex;align-items: center;justify-content: center;">
+		<input id="apply_style_button" class="btn btn-danger btn-lg" type="submit" value="Apply Style" style="height:50px;width:120px">
 	</div>
+	<div id="result" style="height:300px;float: right">
+		<img id="result_image" src="static/images_utilitaries/placeholder.png" width="450px" height="300px">
+	</div>
+</div>
+<div id="selection" class="container" style="width:100%; display: flex;justify-content: space-between; margin-top:10px">
+	<div id="interface_keys" style="width:450px; float: left; height:300px;">
+		<table style="width:100%; table-layout: fixed">
+			<tr>
+				<td style="width: 33%">
+					<div class="key" style="float:left;"><span>D</span></div>
+					<div style="padding: 25px 0px; float:left;"> Distribution</div>
+				</td>
+				<td style="width: 33%">
+					<div class="key" style="float:left"><span>+</span></div>
+					<div style="padding: 25px 0px; float:left;">Add data</div>
+				</td>
+				<td style="width: 33%">
+					<div class="key" style="float:left"><span>-</span></div>
+					<div style="padding: 25px 0px; float:left;">Remove data</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 33%">
+					<div class="key" style="float:left"><span>R</span></div>
+					<div style="padding: 25px 0px; float:left;"> Randomize </div>
+				</td>
+				<td style="width: 33%">
+					<div class="key" style="float:left"><span>G</span></div>
+					<div style="padding: 25px 0px; float:left;">Change grid</div>
+				</td>
+				<td style="width: 33%">
+					<div class="key" style="float:left"><span>O</span></div>
+					<div style="padding: 25px 0px; float:left;">Orientation</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="save" style="width:120px; height:100px; float:left;display: flex;align-items: center;justify-content: center;">
+		<!-- <input id="save_picture_button" class="btn btn-warning btn-lg" type="submit" value="Save PNG" style="height:50px;width:120px"> -->
+	</div>
+	<div id="interface_gans" style="width:450px; float: right; height:300px;">
+		<table style="width:100%; table-layout: fixed">
+			<tr>
+				<td style="width: 50%; padding-bottom: 5px">
+					<img src="static/style-images/mosaic.jpg" width="40%">
+					<input type="radio" name="selection_model" value="mosaic.pth" style="width:15px" checked="checked">
+				</td>
+				<td style="width: 50%; padding-bottom: 5px">
+					<img src="static/style-images/candy.jpg" width="40%">
+					<input type="radio" name="selection_model" value="candy.pth" style="width:15px">
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 50%">
+					<img src="static/style-images/rain-princess.jpg" width="40%">
+					<input type="radio" name="selection_model" value="rain_princess.pth" style="width:15px">
+				</td>
+				<td style="width: 50%">
+					<img src="static/style-images/udnie.jpg" width="40%">
+					<input type="radio" name="selection_model" value="udnie.pth" style="width:15px">
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<script src="{{url_for('static', filename="scripts/d3.js")}}"></script>
+<script src="{{url_for('static', filename="scripts/d3-gridding.js")}}"></script>
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/keys.css')}}">
+<script src="{{url_for('static', filename="scripts/processing_index.js")}}"></script>
+
 {% endblock %}

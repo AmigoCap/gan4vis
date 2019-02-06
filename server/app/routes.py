@@ -5,10 +5,29 @@ from app.forms import LoginForm, RegistrationForm, ImageSubmitForm
 from app.models import User, Task
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.urls import url_parse
-from binascii import a2b_base64
-import os
-import uuid
+from binascii import a2b_base64, b2a_base64
 
+import os, sys, inspect
+import uuid
+from PIL import Image
+
+#
+
+ # realpath() will make your script run, even if you symlink it :)
+# cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
+# if cmd_folder not in sys.path:
+#     sys.path.insert(0, cmd_folder)
+#
+# print(cmd_folder)
+
+ # Use this if you want to include modules from a subfolder
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"gan")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
+
+from neural_style import *
+
+print(cmd_subfolder)
 
 # Redirect to the "index" page when going to route
 @app.route('/')
@@ -19,77 +38,75 @@ def root_page():
 # Defining the homepage view
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    # form = ImageSubmitForm()
+    #
+    # if request.method == 'POST':
+    #     print(1)
 
-    form = ImageSubmitForm()
-
-    if request.method == 'POST':
-
-        # Récupération du sketch au format png
-        output_img_uri = request.form['canvas_data']
-        print(output_img_uri)
-        binary_data = a2b_base64(output_img_uri.split('base64,')[1])
-        print(binary_data)
-
-        static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static')
-
-        print(static_dir)
-
-        # If user is logged in, creation of the db entry
-        if current_user.is_authenticated:
-
-            task = Task(user_id=current_user.id)
-            db.session.add(task)
-            db.session.commit()
-
-            task_id = str(task.id)
-
-            input_path = os.path.join('db_files','input_sketches', task_id + '_sk.png')
-            output_path = os.path.join('db_files','output_predictions', task_id + '_pr.png')
-
-            task.set_input_path(input_path)
-            task.set_output_path(output_path)
-
-            db.session.commit()
-
-        else:
-
-            token = str(uuid.uuid4())
-
-            input_path = os.path.join('prediction_temp', token + '_sk.png')
-            output_path = os.path.join('prediction_temp', token + '_pr.png')
-
-        # On Windows, os.path.join joint with \, must be changed when parsed to URL
-        output_filename = output_path.replace("\\","/")
-
-        print()
-        print('static_dir :',static_dir)
-        print('input_path :',input_path)
-        print(os.path.join(static_dir, input_path))
-
-<<<<<<< Updated upstream
-		else:
-			# Flash message for unsuccessful submission
-			pass
-		return render_template('index.html', title='Home', form=form, output_img=output_img_uri)
-=======
-        # Écriture du sketch sur le serveur au format png
-        fd = open(os.path.join(static_dir, input_path), 'wb')
-        fd.write(binary_data)
-        fd.close()
->>>>>>> Stashed changes
-
-        # Appel du modèle et génération de l'image
-        if pred_one_img.main(static_dir, input_path, output_path) == 0:
-            print(output_path)
-            return render_template('index.html', title='Home', form=form, output_img=url_for('static', filename=output_filename))
-
-        else:
-            # Flash message for unsuccessful prediction
-            pass
-        return render_template('index.html', title='Home', form=form, output_img=output_img_uri)
-
-    return render_template('index.html', title='Home', form=form)
-
+#         # Récupération du sketch au format png
+#         output_img_uri = request.form['canvas_data']
+#         print(output_img_uri)
+#         binary_data = a2b_base64(output_img_uri.split('base64,')[1])
+#         print(binary_data)
+#
+#         static_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static')
+#
+#         print(static_dir)
+#
+#         # If user is logged in, creation of the db entry
+#         if current_user.is_authenticated:
+#
+#             task = Task(user_id=current_user.id)
+#             db.session.add(task)
+#             db.session.commit()
+#
+#             task_id = str(task.id)
+#
+#             input_path = os.path.join('db_files','input_sketches', task_id + '_sk.png')
+#             output_path = os.path.join('db_files','output_predictions', task_id + '_pr.png')
+#
+#             task.set_input_path(input_path)
+#             task.set_output_path(output_path)
+#
+#             db.session.commit()
+#
+#         else:
+#
+#             token = str(uuid.uuid4())
+#
+#             input_path = os.path.join('prediction_temp', token + '_sk.png')
+#             output_path = os.path.join('prediction_temp', token + '_pr.png')
+#
+#         # On Windows, os.path.join joint with \, must be changed when parsed to URL
+#         output_filename = output_path.replace("\\","/")
+#
+#         print()
+#         print('static_dir :',static_dir)
+#         print('input_path :',input_path)
+#         print(os.path.join(static_dir, input_path))
+#
+# # <<<<<<< Updated upstream
+# # 		else:
+# 			# Flash message for unsuccessful submission
+# 			# pass
+# 		#return render_template('index.html', title='Home', form=form, output_img=output_img_uri)
+# # =======
+#         # Écriture du sketch sur le serveur au format png
+#         fd = open(os.path.join(static_dir, input_path), 'wb')
+#         fd.write(binary_data)
+#         fd.close()
+# # >>>>>>> Stashed changes
+#
+#         # Appel du modèle et génération de l'image
+#         if pred_one_img.main(static_dir, input_path, output_path) == 0:
+#             print(output_path)
+#             return render_template('index.html', title='Home', form=form, output_img=url_for('static', filename=output_filename))
+#
+#         else:
+#             # Flash message for unsuccessful prediction
+#             pass
+        # return render_template('index.html', title='Home', form=form, output_img=output_img_uri)
+    return render_template('index.html', title='Home')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -108,6 +125,43 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
+@app.route('/treatment', methods=['GET','POST'])
+def treatment():
+    # Get the AJAX request and create the variable storing the data and the one storing the binary
+    dictionary_request = request.get_json()
+    # A2B : Transform the image into binaries
+    binary_data = a2b_base64(dictionary_request['image'].split('base64,')[1])
+    # Save the model to apply
+    model = dictionary_request['model']
+
+    # Save the image in png format using a random token
+    token = str(uuid.uuid4())
+    fd = open('./app/static/content-images/'+token+'.png', 'wb')
+    fd.write(binary_data)
+    fd.close()
+
+    # Load the image to remove the Alpha Channel
+    png = Image.open('./app/static/content-images/'+token+'.png')
+    png.load() # required for png.split()
+    background = Image.new("RGB", png.size, (255, 255, 255)) # Add a white background to the image
+    background.paste(png, mask=png.split()[3]) # 3 is the alpha channel
+    background.save('./app/static/content-images/'+token+'.jpg', 'JPEG', quality=80) # Save the image in the "static/content-images" directory
+
+    # Run the style transfer using the GAN chosen in model
+    main(content_image='./app/static/content-images/'+token+'.jpg',content_scale=None,output_image='./app/static/output-images/'+token+'.jpg',model="./app/gan/saved_models/"+model,cuda=0)
+
+    # B2A : Open image and transform binaries to image
+    # We need this step in order to delete the output image from the server, and send the content on the client's side
+    with open('./app/static/output-images/'+token+'.jpg', "rb") as image_file:
+        output_image = b2a_base64(image_file.read())
+
+    # Remove the input and ouput images
+    os.remove('./app/static/content-images/'+token+'.png')
+    os.remove('./app/static/content-images/'+token+'.jpg')
+    os.remove('./app/static/output-images/'+token+'.jpg')
+
+    # Return the content of the output to the client with AJAX
+    return(output_image)
 
 @app.route('/logout')
 def logout():
@@ -124,8 +178,8 @@ def user(username):
     print(tasks[0].input_sketch)
     return render_template('user.html', user=user, tasks=tasks)
 
-<<<<<<< Updated upstream
-=======
+#<<<<<<< Updated upstream
+#=======
 @app.route('/my_posts')
 @login_required
 def my_posts():
@@ -133,7 +187,7 @@ def my_posts():
     print(posts)
     return render_template('my_posts.html', title='My posts', posts=posts)
 
->>>>>>> Stashed changes
+#>>>>>>> Stashed changes
 
 @app.route('/register', methods=['GET','POST'])
 def register():
