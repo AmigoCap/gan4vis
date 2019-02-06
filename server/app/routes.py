@@ -5,8 +5,8 @@ from app.forms import LoginForm, RegistrationForm, ImageSubmitForm
 from app.models import User, Task
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.urls import url_parse
-from binascii import a2b_base64
-# from cairosvg import svg2png
+from binascii import a2b_base64, b2a_base64
+
 import os, sys, inspect
 import uuid
 from PIL import Image
@@ -129,7 +129,9 @@ def login():
 def treatment():
     # Get the AJAX request and create the variable storing the data and the one storing the binary
     dictionary_request = request.get_json()
+    # A2B : Transform the image into binaries
     binary_data = a2b_base64(dictionary_request['image'].split('base64,')[1])
+    # Save the model to apply
     model = dictionary_request['model']
 
     # Save the image in png format using a random token
@@ -148,12 +150,18 @@ def treatment():
     # Run the style transfer using the GAN chosen in model
     main(content_image='./app/static/content-images/'+token+'.jpg',content_scale=None,output_image='./app/static/output-images/'+token+'.jpg',model="./app/gan/saved_models/"+model,cuda=0)
 
-    # Remove the input images
+    # B2A : Open image and transform binaries to image
+    # We need this step in order to delete the output image from the server, and send the content on the client's side
+    with open('./app/static/output-images/'+token+'.jpg', "rb") as image_file:
+        output_image = b2a_base64(image_file.read())
+
+    # Remove the input and ouput images
     os.remove('./app/static/content-images/'+token+'.png')
     os.remove('./app/static/content-images/'+token+'.jpg')
+    os.remove('./app/static/output-images/'+token+'.jpg')
 
-    # The main saves the result in the "static/output-image/" directory. We post the name of the input (identical to the input) with AJAX
-    return(token+'.jpg')
+    # Return the content of the output to the client with AJAX
+    return(output_image)
 
 @app.route('/logout')
 def logout():

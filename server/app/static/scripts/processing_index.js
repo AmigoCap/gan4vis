@@ -1,3 +1,5 @@
+var a
+
 $("#apply_style_button").click(function() {
   $.ajax({
     url: "/treatment",
@@ -8,7 +10,7 @@ $("#apply_style_button").click(function() {
     }),
     contentType: "application/json; charset=utf-8",
     success: function(response) {
-      $("#result_image").attr("src", "static/output-images/" + response) // Update the result image with the response
+      $("#result_image").attr("src", 'data:image/jpg;base64,' + response); //"static/output-images/" + response) // Update the result image with the response
     }
   })
 });
@@ -279,8 +281,6 @@ function generate_data(s, d = "random", p) {
 
   var x = d3.scaleLinear()
     .rangeRound([0, width]);
-
-  console.log(data)
 
   var bins = d3.histogram()
     .domain(x.domain())
