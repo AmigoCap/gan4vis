@@ -2,6 +2,9 @@ var d3 = require('d3');
 var fs = require('fs');
 var JSDOM = require('jsdom').JSDOM;
 
+var dest_dir = process.argv[2]
+var animation_index = process.argv[3]
+
 
 const window = (new JSDOM(`<html><head></head><body></body></html>`, {
   pretendToBeVisual: true
@@ -21,10 +24,11 @@ var svg = window.d3.select("body")
   .attr("width", width)
   .attr("height", height)
 
-function main() {
-  var data = d3.range(4).map(d3.randomUniform(1))
+function main(nb_series, target_dir) {
+  var data = d3.range(nb_series).map(d3.randomUniform(1))
+  
 
-  function bar_chart(el, data, x_begin, y_begin, w, h, transition_bool) {
+  function bar_chart(el, data, x_begin, y_begin, w, h) {
     
     var x = d3.scaleBand()
       .domain(Array(data.length ).fill(1).map((x, y) => x + y - 1))
@@ -48,11 +52,6 @@ function main() {
       .attr("fill", function(d, i) { return color_scale(i); })
     
     
-
-  //}
-
-  //function donut_chart (el, data, cx, cy, r_in, r_out) {
-    
     var total = d3.sum(data)
     
     var rel_values = [data.map(d => d/total)]
@@ -74,25 +73,24 @@ function main() {
     
     g = el.append("g")
       .attr("transform", "translate(" + w/2 + ", " + h/2 + ")")
-    
-    if (transition_bool) {
       
-      svg.selectAll("rect").remove()
-    
+    svg.selectAll("rect").remove()
 
-      g.selectAll("arc")
-        .data(pie)
-        .enter().append("g")
-        .attr("class", "arc")
-        .append("path")      
-        .attr("d", arc_f(h/2 - 20, h/2, w/2, h/2))
-        .style("fill", function(d, i) { return color_scale(i); })
-        .transition()
-        .duration(2000)
-        .tween("arc", arcTween)
+    g.selectAll("arc")
+      .data(pie)
+      .enter().append("g")
+      .attr("class", "arc")
+      .append("path")      
+      .attr("d", arc_f(h/2 - 20, h/2, w/2, h/2))
+      .style("fill", function(d, i) { return color_scale(i); })
+      .transition()
+      .duration(1910)
+      .tween("arc", arcTween)
 
-      function arcTween(d) {
+    function arcTween(d) {
+      
         var path = d3.select(this)
+        i = 0
             
         return function(t) {
           x0 = x_begin + x(d.index),
@@ -114,27 +112,18 @@ function main() {
           //text.attr("transform", "translate(" + arc.centroid(f) + ")translate(" + xx + "," + yy + ")rotate(" + ((f.startAngle + f.endAngle) / 2 + 3 * Math.PI / 2) * 180 / Math.PI + ")");
           
           // Reference to the folder from the project root
-          fs.writeFileSync("data/gifs/barchart_label" + 30 + "_t" + Math.floor(100 * t).toString() + ".svg", window.d3.select('.container').html());
+          if (d.index == 3) {
+            //console.log(compteurs[animation_index]++, d.index, t, animation_index)
+            fs.writeFileSync(target_dir + "barchart_label" + animation_index + "_t" + i++ + ".svg", window.d3.select('.container').html());
+          }
           
         };
-
-
-      }
-    } else {
-      
     }
-    
-
   }
-  var display = "bar"
-
-  if(display == "bar") {
-    bar_chart(svg, data, 0, 0, 128, 128, true)
-  } else if (display == "pie") {
-    // donut_chart(svg, data, width/2, height/2, width/2, width/2 - 22)
-  }
+  bar_chart(svg, data, 0, 0, 128, 128)
 }
 
-main()
+console.log("Saving to directory: ")
+console.log(process.cwd())
 
-
+main(nb_items, dest_dir)
