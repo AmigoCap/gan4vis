@@ -33,6 +33,80 @@ var current_distribution = "random";
 
 var all_modes = ["horizontal", "vertical", "treemap"];
 
+var distribution_change = function() {
+  current_distribution = distributions[(distributions.indexOf(current_distribution) + 1) % distributions.length];
+  console.log(current_distribution)
+  data = generate_data(nb_data, current_distribution);
+  draw();
+}
+
+var add_point = function() {
+  nb_data++;
+  data = generate_data(nb_data, current_distribution);
+  console.log("new size: ", nb_data)
+  draw();
+}
+
+var remove_point = function() {
+  nb_data--;
+  data = generate_data(nb_data, current_distribution);
+  console.log("new size: ", nb_data)
+  draw();
+}
+
+var randomize = function() {
+  data = generate_data(nb_data, current_distribution);
+  console.log("new valueWidth: ", gridding.valueWidth());
+  draw();
+}
+
+var change_grid = function() {
+  var current_mode = gridding.mode();
+  gridding.mode(all_modes[(all_modes.indexOf(current_mode) + 1) % all_modes.length])
+  console.log("new mode: ", gridding.mode())
+  draw();
+  current_property = 0; // then if go through properties start with 1st one
+}
+
+var change_orientation = function() {
+  var o = ["up", "down", "left", "right"]; // , "top right"
+  var new_orient = o[(o.indexOf(gridding.orient()) + 1) % o.length];
+  gridding.orient(new_orient);
+  console.log("new orient: ", gridding.orient());
+  draw();
+}
+
+// Manage user interaction by detecting click event on artificial keys
+d3.select("#key_d")
+  .on("click", function(d) {
+    distribution_change()
+  })
+
+d3.select("#key_add")
+  .on("click", function(d) {
+    add_point()
+  })
+
+d3.select("#key_remove")
+  .on("click", function(d) {
+    remove_point()
+  })
+
+d3.select("#key_randomize")
+  .on("click", function(d) {
+    randomize()
+  })
+
+d3.select("#key_grid")
+  .on("click", function(d) {
+    change_grid()
+  })
+
+d3.select("#key_orientation")
+  .on("click", function(d) {
+    change_orientation()
+  })
+
 // Manage user interaction by detecting keydown event
 d3.select("body")
   .on("keydown", function(d) {
@@ -42,36 +116,22 @@ d3.select("body")
 
     // g: change grid
     if (k === 71) {
-      gridding.mode(all_modes[(all_modes.indexOf(current_mode) + 1) % all_modes.length])
-      console.log("new mode: ", gridding.mode())
-      draw();
-
-      current_property = 0; // then if go through properties start with 1st one
+      change_grid()
     }
 
     // d: change distribution
     if (k === 68) {
-
-      current_distribution = distributions[(distributions.indexOf(current_distribution) + 1) % distributions.length];
-      console.log(current_distribution)
-      data = generate_data(nb_data, current_distribution);
-      draw();
+      distribution_change()
     }
 
     // r: redraw
     if (k === 82) {
-      data = generate_data(nb_data, current_distribution);
-      console.log("new valueWidth: ", gridding.valueWidth());
-      draw();
+      randomize()
     }
 
     // o: change orientation
     if (k === 79) {
-      var o = ["up", "down", "left", "right"]; // , "top right"
-      var new_orient = o[(o.indexOf(gridding.orient()) + 1) % o.length];
-      gridding.orient(new_orient);
-      console.log("new orient: ", gridding.orient());
-      draw();
+      change_orientation()
     }
 
     // // h: change valueHeight
@@ -100,18 +160,12 @@ d3.select("body")
 
     // +
     if (k === 39) {
-      nb_data++;
-      data = generate_data(nb_data, current_distribution);
-      console.log("new size: ", nb_data)
-      draw();
+      add_point()
     }
 
     // -
     if (k === 37) {
-      nb_data--;
-      data = generate_data(nb_data, current_distribution);
-      console.log("new size: ", nb_data)
-      draw();
+      remove_point()
     }
 
   })
@@ -119,8 +173,12 @@ d3.select("body")
 // Create the preview chart
 var svg = d3.select("#preview")
   .append("svg")
-  .attr("width", width)
-  .attr("height", height)
+  .attr("id", "svg_preview")
+  // .attr("width", width)
+  // .attr("height", height)
+  .attr("viewBox", "0 0 " + width + " " + height)
+  .attr("perserveAspectRatio", "xMinYMid")
+
 
 function draw() {
 
@@ -201,8 +259,22 @@ function render_image() {
   d3.select("#render-canvas").remove();
   d3.select("#render-img").remove();
 
+  // var test = d3.select('svg')
+  //   .attr("width", width)
+  //   .attr("height", height)
+  //   .attr("viewBox", null)
+  //   .attr("perserveAspectRatio", null)
+
+
+
+
+
   // serialize our SVG XML to a string.
   var source = (new XMLSerializer()).serializeToString(d3.select('svg').node());
+  console.log(source)
+  source = source.replace('viewBox="0 0 450 300"', 'width="' + width + 'px"')
+  source = source.replace('perserveAspectRatio="xMinYMid"', 'height="' + height + 'px"')
+  console.log(source)
 
   var doctype = '<?xml version="1.0" standalone="no"?>' +
     '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';

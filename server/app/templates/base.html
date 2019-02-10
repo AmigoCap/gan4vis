@@ -29,16 +29,9 @@
 		</div>
 
 		<!--  Collect the nav links, forms, and other content for toggling -->
-		<div classe="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li id="home_link"><a href="{{ url_for('index') }}">Home</a></li>
-				{% if current_user.is_anonymous %}
-				<li><a href={{ url_for('login') }}>Login</a></li>
-				{% else %}
-				<li><a href={{ url_for('logout') }}>Logout</a></li>
-				<li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
-				{% endif %}
-				<li><a href="#">About us</a></li>
+				<li><a href="#">About</a></li>
 			</ul>
 		</div>
 	</div>

@@ -15,7 +15,7 @@ class User(UserMixin, db.Model):
 	# Initialization of the link between a user and the tasks submitted
 	tasks = db.relationship('Task', backref='creator', lazy='dynamic')
 
-	# Generate password hash on password input 
+	# Generate password hash on password input
 	def set_password(self, password):
 		self.password_hash = generate_password_hash(password)
 

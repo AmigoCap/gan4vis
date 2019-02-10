@@ -7,57 +7,57 @@
 
 {% block app_content %}
 <div id="title" class="container" style="width:100%">
-	<div style="float: left; text-align:center;margin-bottom:40px; width: 100%">
-		<h1>GAN4VIS</h1>
-		<p>Create your chart and style it with a GAN!</p>
+	<div style="float: left; text-align:center;margin-bottom:2%; width: 100%">
+		<h1 style="font-size:2.3vw;margin-top:1%">GAN4VIS</h1>
+		<p style="font-size:1.5vw;">Create your chart and style it with a GAN!</p>
 	</div>
 </div>
 <div id="charts" class="container" style="width:100%; display: flex;justify-content: space-between">
-	<div id="preview" style="height:300px;float: left"></div>
-	<div id="submission" style=" height:300px; float:left;display: flex;align-items: center;justify-content: center;">
-		<input id="apply_style_button" class="btn btn-danger btn-lg" type="submit" value="Apply Style" style="height:50px;width:120px">
+	<div id="preview" style="width:35%; float: left"></div>
+	<div id="submission" style="width:10%; float:left;display: flex;align-items: center;justify-content: center;">
+		<input id="apply_style_button" class="btn btn-danger btn-lg" type="submit" value="Apply Style" style="width:100%;height:15%;padding: 0% 0% ;font-size:1.1vw;">
 	</div>
-	<div id="result" style="height:300px;float: right">
-		<img id="result_image" src="static/images_utilitaries/placeholder.png" width="450px" height="300px">
+	<div id="result" style="width:35%; float:right">
+		<img id="result_image" src="static/images_utilitaries/placeholder.png" style="width:100%;height:auto">
 	</div>
 </div>
-<div id="selection" class="container" style="width:100%; display: flex;justify-content: space-between; margin-top:10px">
-	<div id="interface_keys" style="width:450px; float: left; height:300px;">
+<div id="selection" class="container" style="width:100%; margin-top:2%; display: flex;justify-content: space-between">
+	<div id="interface_keys" style="width:35%; float: left; height:30%;">
 		<table style="width:100%; table-layout: fixed">
 			<tr>
 				<td style="width: 33%">
-					<div class="key" style="float:left;"><span>D</span></div>
-					<div style="padding: 25px 0px; float:left;"> Distribution</div>
+					<div id="key_d" class="key" style="float:left;"><span>D</span></div>
+					<div style="padding: 10% 0%; float:left;font-size:0.9vw;">Distribution</div>
 				</td>
 				<td style="width: 33%">
-					<div class="key" style="float:left"><span>+</span></div>
-					<div style="padding: 25px 0px; float:left;">Add data</div>
+					<div id="key_add" class="key" style="float:left"><span>+</span></div>
+					<div style="padding: 10% 0%; float:left;font-size:0.9vw;">Add data</div>
 				</td>
 				<td style="width: 33%">
-					<div class="key" style="float:left"><span>-</span></div>
-					<div style="padding: 25px 0px; float:left;">Remove data</div>
+					<div id="key_remove" class="key" style="float:left"><span>-</span></div>
+					<div style="padding: 10% 0%; float:left;font-size:0.9vw;">Remove data</div>
 				</td>
 			</tr>
 			<tr>
 				<td style="width: 33%">
-					<div class="key" style="float:left"><span>R</span></div>
-					<div style="padding: 25px 0px; float:left;"> Randomize </div>
+					<div id="key_randomize" class="key" style="float:left"><span>R</span></div>
+					<div style="padding: 10% 0%; float:left;font-size:0.9vw;"> Randomize </div>
 				</td>
 				<td style="width: 33%">
-					<div class="key" style="float:left"><span>G</span></div>
-					<div style="padding: 25px 0px; float:left;">Change grid</div>
+					<div id="key_grid" class="key" style="float:left"><span>G</span></div>
+					<div style="padding: 10% 0%; float:left;font-size:0.9vw;">Change grid</div>
 				</td>
 				<td style="width: 33%">
-					<div class="key" style="float:left"><span>O</span></div>
-					<div style="padding: 25px 0px; float:left;">Orientation</div>
+					<div id="key_orientation" class="key" style="float:left"><span>O</span></div>
+					<p style="padding: 10% 0%; float:left;font-size:0.9vw;">Orientation</p>
 				</td>
 			</tr>
 		</table>
 	</div>
-	<div id="save" style="width:120px; height:100px; float:left;display: flex;align-items: center;justify-content: center;">
+	<div id="save" style="width:10%; height:30%; float:left;display: flex;align-items: center;justify-content: center;">
 		<!-- <input id="save_picture_button" class="btn btn-warning btn-lg" type="submit" value="Save PNG" style="height:50px;width:120px"> -->
 	</div>
-	<div id="interface_gans" style="width:450px; float: right; height:300px;">
+	<div id="interface_gans" style="width:35%; float: right; height:30%;">
 		<table style="width:100%; table-layout: fixed">
 			<tr>
 				<td style="width: 50%; padding-bottom: 5px">
