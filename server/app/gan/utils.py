@@ -2,20 +2,24 @@ import torch
 from PIL import Image
 
 
-def load_image(filename, size=None, scale=None):
-    img = Image.open(filename)
+def load_image(img, size=None, scale=None):
+    #img = Image.open(filename)
+    print("load_image",img)
     if size is not None:
+        print('a')
         img = img.resize((size, size), Image.ANTIALIAS)
     elif scale is not None:
+        print('b')
         img = img.resize((int(img.size[0] / scale), int(img.size[1] / scale)), Image.ANTIALIAS)
     return img
 
 
-def save_image(filename, data):
+def save_image(data):
     img = data.clone().clamp(0, 255).numpy()
     img = img.transpose(1, 2, 0).astype("uint8")
     img = Image.fromarray(img)
-    img.save(filename)
+    return(img)
+    #img.save(filename)
 
 
 def gram_matrix(y):

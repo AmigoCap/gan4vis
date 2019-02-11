@@ -16,6 +16,20 @@ import utils
 from transformer_net import TransformerNet
 from vgg import Vgg16
 
+# Create dictionary storing the models
+models = {"mosaic.pth" : None, "rain_princess.pth" : None, "candy.pth" : None, "udnie.pth" : None}
+# Import and prepare the models
+for model_name in models.keys():
+    with torch.no_grad():
+        style_model = TransformerNet()
+        state_dict = torch.load("./app/gan/saved_models/"+model_name)
+        # remove saved deprecated running_* keys in InstanceNorm from the checkpoint
+        for k in list(state_dict.keys()):
+            if re.search(r'in\d+\.running_(mean|var)$', k):
+                del state_dict[k]
+        style_model.load_state_dict(state_dict)
+        style_model.to(torch.device("cpu"))
+        models[model_name]=style_model
 
 def check_paths(args):
     try:
@@ -120,14 +134,15 @@ def train(args):
 
 
 def stylize(args):
-
     device = torch.device("cuda" if args["cuda"] else "cpu")
 
-    content_image = utils.load_image(args["content_image"], scale=args["content_scale"])
+    content_image = utils.load_image(args["content_image"],scale=args["content_scale"])
+
     content_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.mul(255))
     ])
+
     content_image = content_transform(content_image)
     content_image = content_image.unsqueeze(0).to(device)
 
@@ -135,21 +150,12 @@ def stylize(args):
         output = stylize_onnx_caffe2(content_image, args)
     else:
         with torch.no_grad():
-            style_model = TransformerNet()
-            state_dict = torch.load(args["model"])
-            # remove saved deprecated running_* keys in InstanceNorm from the checkpoint
-            for k in list(state_dict.keys()):
-                if re.search(r'in\d+\.running_(mean|var)$', k):
-                    del state_dict[k]
-            style_model.load_state_dict(state_dict)
-            style_model.to(device)
             if args["export_onnx"]:
                 assert args["export_onnx"].endswith(".onnx"), "Export model file should end with .onnx"
-                output = torch.onnx._export(style_model, content_image, args["export_onnx"]).cpu()
+                output = torch.onnx._export(models["model"], content_image, args["export_onnx"]).cpu()
             else:
-                output = style_model(content_image).cpu()
-    utils.save_image(args["output_image"], output[0])
-
+                output = models[args["model"]](content_image).cpu()
+    return(utils.save_image(output[0]))
 
 def stylize_onnx_caffe2(content_image, args):
     """
@@ -170,6 +176,6 @@ def stylize_onnx_caffe2(content_image, args):
     return torch.from_numpy(c2_out)
 
 
-def main(content_image,content_scale,output_image,model,cuda):
-    dictionary_styling_information={"content_image":content_image,"content_scale":content_scale,"output_image":output_image,"model":model,"cuda":cuda,"export_onnx":None}
-    stylize(dictionary_styling_information)
+# def main(dict):
+#     #dictionary_styling_information={"content_image":content_image,"content_scale":content_scale,"output_image":output_image,"model":model,"cuda":cuda,"export_onnx":None}
+#     return(stylize(dict))
