@@ -17,7 +17,7 @@ from transformer_net import TransformerNet
 from vgg import Vgg16
 
 # Create dictionary storing the models
-models = {"mosaic.pth" : None, "rain_princess.pth" : None, "candy.pth" : None, "udnie.pth" : None}
+models = {"mosaic.pth" : None, "rain_princess.pth" : None, "candy.pth" : None, "udnie.pth" : None, "map.pth" : None, "pollock.pth" : None}
 # Import and prepare the models
 for model_name in models.keys():
     with torch.no_grad():
@@ -142,7 +142,6 @@ def stylize(args):
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.mul(255))
     ])
-
     content_image = content_transform(content_image)
     content_image = content_image.unsqueeze(0).to(device)
 
@@ -174,8 +173,3 @@ def stylize_onnx_caffe2(content_image, args):
     c2_out = prepared_backend.run(inp)[0]
 
     return torch.from_numpy(c2_out)
-
-
-# def main(dict):
-#     #dictionary_styling_information={"content_image":content_image,"content_scale":content_scale,"output_image":output_image,"model":model,"cuda":cuda,"export_onnx":None}
-#     return(stylize(dict))

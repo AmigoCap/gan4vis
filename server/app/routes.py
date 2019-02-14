@@ -40,17 +40,16 @@ def treatment():
     ### Transform binary data to PIL format (Step could be avoided if we find something like "Image.froma")
     dataBytesIO = BytesIO(binary_data)
     png = Image.open(dataBytesIO)
-    print("png",png)
 
     ### Work on background and remove the Alpha Channel
     #background = Image.open('./app/static/style-images/'+re.sub('_','-',re.sub('.pth','.jpg',model)))
-    #background = Image.open('./app/static/style-images/'+'us_flag.jpg')
+    #background = Image.open('./app/static/style-images/'+"white-noise.jpg")
 
     #background = background.resize((450,300),Image.ANTIALIAS)
     #background = background.filter(ImageFilter.GaussianBlur(radius=100))# Flou
 
     # background = background.filter(ImageFilter.FIND_EDGES)
-    # background = background.filter(ImageFilter.GaussianBlur(radius=7))
+    # background = background.filter(ImageFilter.GaussianBlur(radius=30))
     background = Image.new("RGB", png.size, (255, 255, 255)) # Add a white background to the image
 
     background.paste(png, mask=png.split()[3]) # 3 is the alpha channel
