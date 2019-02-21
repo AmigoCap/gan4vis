@@ -1,11 +1,17 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.models import User, Task
+from app.models import Transfer
 from binascii import a2b_base64, b2a_base64
 import re
 import os, sys, inspect
 from PIL import Image, ImageFilter
 from io import StringIO, BytesIO
+import uuid
+import time
+
+from datetime import datetime
+
+import logging
 
 # Use this if you want to include modules from a subfolder
 cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"gan")))
@@ -23,49 +29,82 @@ def root_page():
 # Defining the homepage view
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html', title='Home')
+    token = request.args.get('token')
+    app.logger.info("index token={}".format(token))
+    dict_transfer = {"token":"placeholder","model":"mosaic.pth","distribution":"random","datapoints":"","grid":"vertical","orientation":"up"}
+    if token:
+        transfer = Transfer.query.filter_by(token=token).first()
+        dict_transfer = {"token":transfer.token,"model":transfer.model,"distribution":transfer.distribution,"datapoints":transfer.datapoints,"grid":transfer.grid,"orientation":transfer.orientation}
+    return render_template('index.html', title='Home', dict_transfer=dict_transfer)
 
 
 @app.route('/treatment', methods=['GET','POST'])
 def treatment():
-    ### Get the AJAX request and create the variable storing the data and the one storing the binary
+    token = str(uuid.uuid4())
+
+    ### 1 - Get the AJAX request and create the variable storing the data and the one storing the binary
     dictionary_request = request.get_json()
+    model = dictionary_request['model'] ## Save the model to apply
+    distribution = dictionary_request['distribution']
+    datapoints = dictionary_request['datapoints']
+    grid = dictionary_request['grid']
+    orientation = dictionary_request['orientation']
 
-    ### Save the model to apply
-    model = dictionary_request['model']
+    ### 2 - Prepare the input image
+    app.logger.info("treatment token={} : IMAGE-INPUT START".format(token))
+    t_image_input_start = time.time()
 
-    ### A2B : Transform the image into binaries
+    # A2B : Transform the image into binaries
     binary_data = a2b_base64(dictionary_request['image'].split('base64,')[1])
 
-    ### Transform binary data to PIL format (Step could be avoided if we find something like "Image.froma")
+    # Transform binary data to PIL format (Step could be avoided if we find something like "Image.froma")
     dataBytesIO = BytesIO(binary_data)
     png = Image.open(dataBytesIO)
 
-    ### Work on background and remove the Alpha Channel
-    #background = Image.open('./app/static/style-images/'+re.sub('_','-',re.sub('.pth','.jpg',model)))
-    #background = Image.open('./app/static/style-images/'+"white-noise.jpg")
-
-    #background = background.resize((450,300),Image.ANTIALIAS)
-    #background = background.filter(ImageFilter.GaussianBlur(radius=100))# Flou
-
-    # background = background.filter(ImageFilter.FIND_EDGES)
-    # background = background.filter(ImageFilter.GaussianBlur(radius=30))
+    # Work on background and remove the Alpha Channel
+    # background = Image.open('./app/static/style-images/'+re.sub('_','-',re.sub('.pth','.jpg',model))) # Use the style image as background
+    # background = Image.open('./app/static/style-images/'+"white-noise.jpg") # Use white noise as background
+    # background = background.resize((450,300),Image.ANTIALIAS) # Resize the background
+    # background = background.filter(ImageFilter.FIND_EDGES) # Detect background edges
+    # background = background.filter(ImageFilter.GaussianBlur(radius=30)) # Blur the background
     background = Image.new("RGB", png.size, (255, 255, 255)) # Add a white background to the image
 
     background.paste(png, mask=png.split()[3]) # 3 is the alpha channel
 
-    ### Run the style transfer using the GAN chosen in model
+    t_image_input = time.time() - t_image_input_start
+    app.logger.info("treatment token={} : IMAGE-INPUT END ({}s)".format(token,t_image_input))
+
+    ### 3 - Run the style transfer using the GAN chosen in model
+
+    app.logger.info("treatment token={} : GAN START".format(token))
+    t_gan_start = time.time()
+
     image_after_gan = stylize({"content_image":background,"content_scale":None,"model":model,"cuda":0,"export_onnx":None})
 
-    ### B2A : Transform image from PIL to bytes and then to image for the interface
+    t_gan = time.time() - t_gan_start
+    app.logger.info("treatment token={} : GAN END ({}s)".format(token,t_gan))
+
+    ### 4 - Prepare the output image, transform image from PIL to bytes and then to image for the interface
+
+    app.logger.info("treatment token={} : IMAGE-OUTPUT START".format(token))
+    t_image_output_start = time.time()
+
     imgByteArr = BytesIO()
+    image_after_gan.save("./app/static/output_images/{}.jpg".format(token), format='JPEG')
     image_after_gan.save(imgByteArr, format='JPEG')
     output_image = imgByteArr.getvalue()
     output_image = b2a_base64(output_image)
 
-    # Return the content of the output to the client with AJAX
-    return(output_image)
+    t_image_output = t_image_output_start - time.time()
+    app.logger.info("treatment token={} : IMAGE-OUTPUT END ({}s)".format(token,t_image_output))
 
+    t = Transfer(token = token, model = model, distribution = distribution, datapoints = datapoints, grid = grid, orientation = orientation)
+    db.session.add(t)
+    db.session.commit()
+
+    # Return the content of the output to the client with AJAX
+    return(token)
+    
 @app.route('/about')
 def about():
     return None

@@ -3,8 +3,6 @@ from PIL import Image
 
 
 def load_image(img, size=None, scale=None):
-    #img = Image.open(filename)
-    print("load_image",img)
     if size is not None:
         print('a')
         img = img.resize((size, size), Image.ANTIALIAS)
