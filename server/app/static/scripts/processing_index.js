@@ -1,16 +1,19 @@
-var a
-
 $("#apply_style_button").click(function() {
   $.ajax({
     url: "/treatment",
     type: "POST",
     data: JSON.stringify({
       "image": ajax_binary_image, // Send the binary of the input chart image
-      "model": $("input:radio[name ='selection_model']:checked").val() // Send the chosen model
+      "model": $("input:radio[name ='selection_model']:checked").val(), // Send the chosen model
+      "distribution": current_distribution,
+      "datapoints": data.join(','),
+      'grid': gridding.mode(),
+      'orientation': gridding.orient()
     }),
     contentType: "application/json; charset=utf-8",
     success: function(response) {
-      $("#result_image").attr("src", 'data:image/jpg;base64,' + response); //"static/output-images/" + response) // Update the result image with the response
+      $("#result_image").attr("src", "static/output_images/" + response + ".jpg") //"data:image/jpg;base64," + response); //"static/output-images/" + response) // Update the result image with the response
+      history.pushState(window.location.href, "index", "?token=" + response)
     }
   })
 });
@@ -18,24 +21,34 @@ $("#apply_style_button").click(function() {
 var width = 450,
   height = 300;
 
-var gridding = d3.gridding()
+var gridding = d3.gridding() // Declare the grid
   .size([width - 20, height - 20])
   .offset([10, 10])
   .valueHeight("__value")
-  .orient("up")
-  .mode("vertical");
+  .orient(transfer.orientation)
+  .mode(transfer.grid);
 
-var nb_data = 10
-var data = generate_data(nb_data); // default random
+//Declare variables to draw
+var nb_data;
+var data; //datapoints
+var current_property = 0; //
+var current_distribution = transfer.distribution; //distribution
 
-var current_property = 0;
-var current_distribution = "random";
+// Complete declaration with values.
+// If the token is not the placeholder use datapoints from the database. Otherwise, use random points
+if (transfer.token !== "placeholder") {
+  data = transfer.datapoints.split(",").map(Number);
+  nb_data = data.length;
+} else {
+  nb_data = 10;
+  data = generate_data(nb_data);
+}
 
 var all_modes = ["horizontal", "vertical", "treemap"];
 
 var distribution_change = function() {
   current_distribution = distributions[(distributions.indexOf(current_distribution) + 1) % distributions.length];
-  console.log(current_distribution)
+  console.log("current distribution", current_distribution)
   data = generate_data(nb_data, current_distribution);
   draw();
 }
@@ -59,6 +72,7 @@ var randomize = function() {
   console.log("new valueWidth: ", gridding.valueWidth());
   draw();
 }
+
 
 var change_grid = function() {
   var current_mode = gridding.mode();
@@ -181,7 +195,7 @@ var svg = d3.select("#preview")
 
 
 function draw() {
-
+  console.log(gridding)
   var griddingData = gridding(data);
 
   var squares = svg.selectAll(".square")
@@ -243,13 +257,6 @@ function draw() {
   // indexes.exit().remove();
 }
 
-// result image
-// d3.select("#result").append('img')
-//   .attr('width', width)
-//   .attr('height', height)
-//   .attr("id", "render-final")
-//   .attr("src", "img/placeholder.png");
-
 // Define variable to be passed in AJAX
 var ajax_binary_image;
 
@@ -259,22 +266,11 @@ function render_image() {
   d3.select("#render-canvas").remove();
   d3.select("#render-img").remove();
 
-  // var test = d3.select('svg')
-  //   .attr("width", width)
-  //   .attr("height", height)
-  //   .attr("viewBox", null)
-  //   .attr("perserveAspectRatio", null)
-
-
-
-
-
   // serialize our SVG XML to a string.
   var source = (new XMLSerializer()).serializeToString(d3.select('svg').node());
-  console.log(source)
-  source = source.replace('viewBox="0 0 450 300"', 'width="' + width + 'px"')
+
+  source = source.replace('viewBox="0 0 450 300"', 'width="' + width + 'px"') //Tinkering with string to remove the effect of responsive
   source = source.replace('perserveAspectRatio="xMinYMid"', 'height="' + height + 'px"')
-  console.log(source)
 
   var doctype = '<?xml version="1.0" standalone="no"?>' +
     '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
