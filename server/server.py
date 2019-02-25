@@ -2,8 +2,8 @@ from app import app
 import logging
 from logging.handlers import TimedRotatingFileHandler#RotatingFileHandler
 
-# if __name__ == "__main__":
-#     app.run(host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
 
 if __name__ != "__main__": # Being run through gunicorn
     gunicorn_logger = logging.getLogger("gunicorn.error")
@@ -17,7 +17,3 @@ if __name__ != "__main__": # Being run through gunicorn
 
     # Add the Formatter to the Handler
     logger_handler.setFormatter(logger_formatter)
-    gunicorn_logger.addHandler(logger_handler)
-
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
