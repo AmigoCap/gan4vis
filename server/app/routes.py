@@ -62,12 +62,12 @@ def treatment():
     png = Image.open(dataBytesIO)
 
     # Work on background and remove the Alpha Channel
-    # background = Image.open('./app/static/style-images/'+re.sub('_','-',re.sub('.pth','.jpg',model))) # Use the style image as background
+    background = Image.open('./app/static/style-images/'+re.sub('_','-',re.sub('.pth','.jpg',model))) # Use the style image as background
     # background = Image.open('./app/static/style-images/'+"white-noise.jpg") # Use white noise as background
-    # background = background.resize((450,300),Image.ANTIALIAS) # Resize the background
+    background = background.resize((450,300),Image.ANTIALIAS) # Resize the background
     # background = background.filter(ImageFilter.FIND_EDGES) # Detect background edges
-    # background = background.filter(ImageFilter.GaussianBlur(radius=30)) # Blur the background
-    background = Image.new("RGB", png.size, (255, 255, 255)) # Add a white background to the image
+    background = background.filter(ImageFilter.GaussianBlur(radius=100)) # Blur the background
+    # background = Image.new("RGB", png.size, (255, 255, 255)) # Add a white background to the image
 
     background.paste(png, mask=png.split()[3]) # 3 is the alpha channel
 
