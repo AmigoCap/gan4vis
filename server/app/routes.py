@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, send_file
 from app import app, db
 from app.models import Transfer
 from binascii import a2b_base64, b2a_base64
@@ -108,3 +108,8 @@ def treatment():
 @app.route('/about')
 def about():
     return render_template('about.html', title='GAN4VIS - About')
+
+@app.route('/preview/<token>.jpg')
+def preview(token):
+    print(token)
+    return send_file("./static/output_images/{}.jpg".format(token), mimetype='image/jpg')
