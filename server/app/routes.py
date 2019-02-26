@@ -35,7 +35,7 @@ def index():
     if token:
         transfer = Transfer.query.filter_by(token=token).first()
         dict_transfer = {"token":transfer.token,"model":transfer.model,"distribution":transfer.distribution,"datapoints":transfer.datapoints,"grid":transfer.grid,"orientation":transfer.orientation}
-    return render_template('index.html', title='Home', dict_transfer=dict_transfer)
+    return render_template('index.html', title='GAN4VIS', dict_transfer=dict_transfer)
 
 
 @app.route('/treatment', methods=['GET','POST'])
@@ -104,7 +104,7 @@ def treatment():
 
     # Return the content of the output to the client with AJAX
     return(token)
-    
+
 @app.route('/about')
 def about():
-    return None
+    return render_template('about.html', title='GAN4VIS - About')
