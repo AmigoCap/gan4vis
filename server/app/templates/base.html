@@ -5,7 +5,6 @@
 <link rel="stylesheet" href="{{url_for('static', filename='styles/mainpage.css')}}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 {% endblock %}
-
 {% block scripts %}
 {{ super() }}
 <script src="{{url_for('static', filename='scripts/activate_navbar_elems.js')}}"></script>
@@ -14,6 +13,14 @@
 
 {% block title %}
 {% if title %}{{title}}{% else %}Welcome to the GAN4VIS website project!{% endif %}
+{% endblock %}
+
+{% block metas %}
+	<meta name="twitter:card" content="summary" />
+	<!-- <meta name="twitter:site" content="@flickr" /> -->
+	<meta name="twitter:title" content="Small Island Developing States Photo Submission" />
+	<meta name="twitter:description" content="View the album on Flickr." />
+	<meta name="twitter:image" content="https://gan4vis.net/preview/{{dict_transfer.token}}.jpg" />
 {% endblock %}
 
 {% block navbar %}
