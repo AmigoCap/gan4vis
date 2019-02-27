@@ -1,13 +1,6 @@
 {% extends "bootstrap/base.html" %}
 
-{% block styles %}
-{{super()}}
-<link rel="stylesheet" href="{{url_for('static', filename='styles/mainpage.css')}}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
+{% block head %}
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135285115-1"></script>
 <script>
@@ -17,9 +10,10 @@
 
   gtag('config', 'UA-135285115-1');
 </script>
-
-<script src="{{url_for('static', filename='scripts/activate_navbar_elems.js')}}"></script>
-{% block app_scripts %}{% endblock %}
+<script src="/static/scripts/jquery-3.3.1.min.js"></script>
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='styles/mainpage.css')}}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 {% endblock %}
 
 {% block title %}
@@ -27,12 +21,19 @@
 {% endblock %}
 
 {% block metas %}
+<!-- Twitter -->
 {% if title == "GAN4VIS" %}
 	<meta name="twitter:card" content="summary" />
 	<meta name="twitter:title" content="GAN4VIS" />
 	<meta name="twitter:description" content="Style your visualizations thanks to deep learning" />
 	<meta name="twitter:image" content="https://www.gan4vis.net/preview/{{dict_transfer.token}}.jpg" />
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{url_for('static', filename='scripts/activate_navbar_elems.js')}}"></script>
+{% block app_scripts %}{% endblock %}
 {% endblock %}
 
 {% block navbar %}
@@ -60,7 +61,6 @@
 {% endblock %}
 
 {% block content %}
-<script src="/static/scripts/jquery-3.3.1.min.js"></script>
 <div class="container">
 	{% with messages = get_flashed_messages() %}
 	{% if messages %}
