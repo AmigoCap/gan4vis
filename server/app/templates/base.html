@@ -5,8 +5,19 @@
 <link rel="stylesheet" href="{{url_for('static', filename='styles/mainpage.css')}}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 {% endblock %}
+
 {% block scripts %}
 {{ super() }}
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-135285115-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-135285115-1');
+</script>
+
 <script src="{{url_for('static', filename='scripts/activate_navbar_elems.js')}}"></script>
 {% block app_scripts %}{% endblock %}
 {% endblock %}
