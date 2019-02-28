@@ -1,4 +1,4 @@
-$("#apply_style_button").click(function() {
+$("#apply_style_button").bind("touchstart click",function() {
   $.ajax({
     url: "/treatment",
     type: "POST",
