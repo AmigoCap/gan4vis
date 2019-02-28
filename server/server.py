@@ -17,3 +17,8 @@ if __name__ != "__main__": # Being run through gunicorn
 
     # Add the Formatter to the Handler
     logger_handler.setFormatter(logger_formatter)
+    gunicorn_logger.addHandler(logger_handler)
+
+    # Link to the Flask logger
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
