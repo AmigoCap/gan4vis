@@ -19,7 +19,7 @@ We started using various models to explore what deep learning could do to help v
   <li>Automatically generate transitions between charts</li>
   <li>Transfer style from one image onto a visualization</li>
 </ul>
-Below are some of our results. Left is the automated creation of bars chart from line charts. Right is the generation of transition images between bar charts and pie charts.
+Below are some of our results. Left is the automated creation of bar charts from line charts. Right is the generation of transition images between bar charts and pie charts.
 </p>
 
 <div>
@@ -29,7 +29,7 @@ Below are some of our results. Left is the automated creation of bars chart from
 </div>
 
 <p>
-  After testing several kinds of models, we decided go for the application of style transfer.
+  After testing several kinds of models, we decided to go for the application of style transfer.
 </p>
 
 <h4>Style Transfer</h4>
@@ -41,13 +41,13 @@ Below are some of our results. Left is the automated creation of bars chart from
 <h4>First tries</h4>
 
 <p>
-  The first model we played around with was a simple pix2pix model. We wanted to see if there was some value into teaching the model to transform a simple visualization, created with matplotlib, into a more elaborate one created with D3. Our idea was to see if we could have a model learn what is the matplotlib or D3 visualization style. Below are some of our first results.
+  The first model we played around with was a simple pix2pix model. We wanted to see if there was some value into teaching the model to transform a simple visualization, into a more elaborate one. Our idea was to see if we could have a model learn what is the matplotlib or D3 visualization style. Below are some of our first results. On the left, we wanted to transform the matplotlib style into a simple D3 styled chart. On the right, we wanted to transform a raw D3 style into a fancier one.
 </p>
 
 <div>
 <img src="static/utilitaries_images/transfer_matplotlib.jpg" style="float:left; margin-left: auto; margin-right: auto; width:50%">
 <img src="static/utilitaries_images/transfer_d3.jpg" style="float:left; margin-left: auto; margin-right: auto; width:50%">
-<h5 style="text-align:center">Figure 2 : First style transfer results to transform the matplotlib style into a simple D3 chart and raw D3 toward fancy D3</h5>
+<h5 style="text-align:center">Figure 2 : Style transfer results to transform the matplotlib style into a simple D3 chart, and raw D3 style toward fancy D3 style</h5>
 </div>
 
 <p>
@@ -63,19 +63,19 @@ Below are some of our results. Left is the automated creation of bars chart from
 <h4>Interface - D3 gridding</h4>
 
 <p>
-  We first needed inputs for our system. We wanted everyone to be able to use the platform, not only people with visualization generation skills. This is why we settled for an interactive interface built in JavaScript. We used <a href="https://github.com/romsson/d3-gridding" target="_blank">d3-gridding</a>, a D3 module, written by <a href="https://github.com/romsson" target="_blank">Romain Vuillemot</a>, to create our visualization generator.
+  We first needed inputs for our system. We wanted everyone to be able to use the platform, not only people with visualization generation skills. This is why we settled for an interactive interface built in JavaScript. We used <a href="https://github.com/romsson/d3-gridding" target="_blank">d3-gridding</a>, a D3 module, written by <a href="http://romain.vuillemot.net/" target="_blank">Romain Vuillemot</a>, to create our visualization generator.
 </p>
 
 <h4>Treatment - Fast Neural Style</h4>
 
 <p>
-  Once our input generated, we needed a model to transfer styles on them. We discovered a great model from PyTorch that we used <a href="https://github.com/pytorch/examples/tree/master/fast_neural_style" target="_blank">fast_neural_style</a>.
+  Once our input generated, we needed a model to transfer styles on them. We discovered a great model from PyTorch, originally created for paintings, that we used <a href="https://github.com/pytorch/examples/tree/master/fast_neural_style" target="_blank">fast_neural_style</a>.
 </p>
 
 <h3>Experimentations</h3>
 
 <p>
-  When the platform was built here were the first results we came up with.
+  Once the platform built, here were the first results we came up with.
 </p>
 
 <div style="width:100%">
@@ -100,7 +100,7 @@ Below are some of our results. Left is the automated creation of bars chart from
 </div>
 
 <p>
-  Once sent to the server, the chart is preprocessed to have the right format. Then we import a new image, often the style image itself, to permform a special treatment which output will be fed to the style transfer model. The treatment we provide is quite simple. The style image undergoes a filter, depending on the user's choice, that can be a gaussian blur or an edge detection for instance (treatment 1, treatment 2, ...). Then we paste the input from the interface onto the filtered style image. This results in the intput we then give to the model.
+  Once sent to the server, the chart is preprocessed to have the right format. Then we import a new image, often the style image itself, to permform a special treatment which output will be fed to the style transfer model. The treatment we provide is quite simple. The style image undergoes a filter, depending on the user's choice, that can be a gaussian blur or an edge detection for instance (treatment 1, treatment 2, ...) [Only gaussian blur for now]. Then we paste the input from the interface onto the filtered style image. This results in the intput we then give to the model.
 </p>
 
 <p>
@@ -109,25 +109,25 @@ Below are some of our results. Left is the automated creation of bars chart from
 
 <div style="width:100%">
 <img src="static/utilitaries_images/mosaic_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
-<img src="static/utilitaries_images/pollock_simple.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/pollock_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
 <img src="static/utilitaries_images/udnie_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
-<img src="static/utilitaries_images/map_simple.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/map_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
 <h5 style="text-align:center; margin-top:10px">Figure 5 : Style images as background with heavy gaussian blur (Pillow: r=100)</h5>
 </div>
 
 <div style="width:100%">
 <img src="static/utilitaries_images/mosaic_edge_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
-<img src="static/utilitaries_images/pollock_simple.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/pollock_edge_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
 <img src="static/utilitaries_images/udnie_edge_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
-<img src="static/utilitaries_images/map_simple.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/map_edge_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
 <h5 style="text-align:center; margin-top:10px">Figure 6 : Style images as background with edge detection and small gaussian blur (Pillow: r=7) </h5>
 </div>
 
 <div>
 <img src="static/utilitaries_images/mosaic_noise.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
-<img src="static/utilitaries_images/pollock_simple.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/pollock_noise.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
 <img src="static/utilitaries_images/udnie_noise.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
-<img src="static/utilitaries_images/map_simple.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/map_noise.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
 <h5 style="text-align:center; margin-top:10px">Figure 7 : White noise as a common background </h5>
 </div>
 
@@ -136,6 +136,6 @@ We opted for a very heuristic method. The possibilities are infinite even withou
 <h3>More use cases for visualizations ...</h3>
 
 <p>
-  We said at the beginning that we looked for an application of deep learning in the field of visualization. We found one. Yet our first experiments led us to believe that there was something to do around transitions. Indeed, transitions between visualization are difficult to imagine and horribly tedious to implement. This is why some of us have been working on this transition implementation in parallel.
+  We said at the beginning that we looked for an application of deep learning in the field of visualization. We found one. Yet our first experiments led us to believe that there was something to do around transitions. Indeed, transitions between visualization are difficult to imagine and horribly tedious to implement. This is why some of us have been working on this transition implementation in parallel. To be continued.
 </p>
 {% endblock %}

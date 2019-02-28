@@ -63,9 +63,9 @@ def treatment():
 
     # Work on background and remove the Alpha Channel
     background = Image.open('./app/static/style-images/'+re.sub('_','-',re.sub('.pth','.jpg',model))) # Use the style image as background
-    # background = Image.open('./app/static/style-images/'+"white-noise.jpg") # Use white noise as background
+    #background = Image.open('./app/static/style-images/'+"white-noise.jpg") # Use white noise as background
     background = background.resize((450,300),Image.ANTIALIAS) # Resize the background
-    # background = background.filter(ImageFilter.FIND_EDGES) # Detect background edges
+    #background = background.filter(ImageFilter.FIND_EDGES) # Detect background edges
     background = background.filter(ImageFilter.GaussianBlur(radius=100)) # Blur the background
     # background = Image.new("RGB", png.size, (255, 255, 255)) # Add a white background to the image
 
@@ -105,9 +105,9 @@ def treatment():
     # Return the content of the output to the client with AJAX
     return(token)
 
-@app.route('/about')
-def about():
-    return render_template('about.html', title='GAN4VIS - About')
+@app.route('/process')
+def process():
+    return render_template('process.html', title='GAN4VIS - Process')
 
 @app.route('/preview/<token>.jpg')
 def preview(token):
