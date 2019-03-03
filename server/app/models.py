@@ -9,6 +9,7 @@ class Transfer(db.Model):
 	datapoints = db.Column(db.String(120), index=True)
 	grid = db.Column(db.String(64), index=True)
 	orientation = db.Column(db.String(64), index=True)
+	ratio = db.Column(db.Integer, index=True, default=1)
 
 	def __repr__(self):
 		return '<Tranfert {}>'.format(self.token)

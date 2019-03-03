@@ -1,4 +1,4 @@
-$("#apply_style_button").bind("touchstart click",function() {
+$("#apply_style_button").on("touchstart click",function() {
   $.ajax({
     url: "/treatment",
     type: "POST",
@@ -8,11 +8,19 @@ $("#apply_style_button").bind("touchstart click",function() {
       "distribution": current_distribution,
       "datapoints": data.join(','),
       'grid': gridding.mode(),
-      'orientation': gridding.orient()
+      'orientation': gridding.orient(),
+      'ratio': current_ratio
     }),
     contentType: "application/json; charset=utf-8",
+    beforeSend: function() {
+      document.getElementById("download_button").style.visibility = "hidden" //hidden the download option
+      $('#spinning_wheel').show();    /*showing  a div with spinning image */
+    },
     success: function(response) {
-      $("#result_image").attr("src", "static/output_images/" + response + ".jpg") //"data:image/jpg;base64," + response); //"static/output-images/" + response) // Update the result image with the response
+      $('#spinning_wheel').hide();
+      document.getElementById("download_button").style.visibility = "visible" //show the download option
+      $("#result_image").attr("src", "static/output_images/" + response + ".jpg") //Update the result image
+      document.getElementById('download_link').setAttribute("href","static/output_images/" + response + ".jpg") //Update the download target
       history.pushState(window.location.href, "index", "?token=" + response)
     }
   })
@@ -21,9 +29,13 @@ $("#apply_style_button").bind("touchstart click",function() {
 var width = 450,
   height = 300;
 
+// Initialization of the ratios
+var current_ratio = transfer.ratio; // Get the initial ratio from the server
+var ratios = [1,2,3,4,5,6,7,8,9,10]
+
 var gridding = d3.gridding() // Declare the grid
-  .size([width - 20, height - 20])
-  .offset([10, 10])
+  .size([width - 20*current_ratio, height - 20*current_ratio]) //Change the ratio depending on current_ratio
+  .offset([10*current_ratio, 10*current_ratio]) //Change the ratio depending on current_ratio
   .valueHeight("__value")
   .orient(transfer.orientation)
   .mode(transfer.grid);
@@ -33,6 +45,7 @@ var nb_data;
 var data; //datapoints
 var current_property = 0; //
 var current_distribution = transfer.distribution; //distribution
+
 
 // Complete declaration with values.
 // If the token is not the placeholder use datapoints from the database. Otherwise, use random points
@@ -90,6 +103,28 @@ var change_orientation = function() {
   draw();
 }
 
+// Function to zoom on the chart
+var ratio_increase = function() {
+  if (ratios.indexOf(current_ratio) === 0){
+  } else {
+    current_ratio = ratios[(ratios.indexOf(current_ratio) - 1) % ratios.length]
+  }
+  gridding.size([width - 20*current_ratio, height - 20*current_ratio])
+  gridding.offset([10*current_ratio, 10*current_ratio])
+  draw();
+}
+
+// Function to decrease the zoom
+var ratio_decrease = function(){
+  if (ratios.indexOf(current_ratio) === ratios.length-1){
+  } else {
+    current_ratio = ratios[(ratios.indexOf(current_ratio) + 1) % ratios.length]
+  }
+  gridding.size([width - 20*current_ratio, height - 20*current_ratio])
+  gridding.offset([10*current_ratio, 10*current_ratio])
+  draw();
+}
+
 // Manage user interaction by detecting click event on artificial keys
 d3.select("#key_d")
   .on("click", function(d) {
@@ -121,6 +156,16 @@ d3.select("#key_orientation")
     change_orientation()
   })
 
+d3.select("#key_ratio_increase")
+  .on("click", function(d) {
+    ratio_increase()
+  })
+
+d3.select("#key_ratio_decrease")
+  .on("click", function(d) {
+    ratio_decrease()
+  })
+
 // Manage user interaction by detecting keydown event
 d3.select("body")
   .on("keydown", function(d) {
@@ -148,6 +193,16 @@ d3.select("body")
       change_orientation()
     }
 
+    // r: ratio increase
+    if (k === 87) {
+      ratio_increase()
+    }
+
+    // r: ratio decrease
+    if (k === 72) {
+      ratio_decrease()
+    }
+
     // // h: change valueHeight
     // if (k === 72) {
     // 	if (gridding.valueHeight() === null) {
@@ -159,7 +214,7 @@ d3.select("body")
     // 	console.log("new valueHeight: ", gridding.valueHeight());
     // 	draw();
     // }
-    //
+    // //
     // // w: change valueWidth
     // if (k === 87) {
     // 	if (gridding.valueWidth() === null) {
@@ -188,14 +243,11 @@ d3.select("body")
 var svg = d3.select("#preview")
   .append("svg")
   .attr("id", "svg_preview")
-  // .attr("width", width)
-  // .attr("height", height)
   .attr("viewBox", "0 0 " + width + " " + height)
   .attr("perserveAspectRatio", "xMinYMid")
 
 
 function draw() {
-  console.log(gridding)
   var griddingData = gridding(data);
 
   var squares = svg.selectAll(".square")
@@ -276,21 +328,32 @@ function render_image() {
     '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
 
   // create a file blob of our SVG.
-  var blob = new Blob([doctype + source], {
-    type: 'image/svg+xml;charset=utf-8'
-  });
-
-  var url = window.URL.createObjectURL(blob);
+  // var blob = new Blob([doctype + source], {
+  //   type: 'image/svg+xml;charset=utf-8'
+  // });
+  //
+  // console.log(blob)
+  //
+  // var url = window.URL.createObjectURL(blob);
+  //
+  // console.log(url)
 
   // Put the svg into an image tag so that the Canvas element can read it in.
-  var img = d3.select('body').append('img')
-    .attr('width', 400)
-    .attr('height', 300)
-    .style("display", "none")
-    .attr("id", "render-img")
-    .node();
+  //
+  // var img = d3.select('body').append('img')
+  //   .attr('width', 400)
+  //   .attr('height', 300)
+  //   .style("display", "none")
+  //   .attr("id", "render-img")
+  //   .node();
 
-  img.onload = function() {
+  // console.log("///",img)
+
+  // Use image to store the encoded svg
+  var img = new Image();
+  img.src = 'data:image/svg+xml;utf8,' + doctype + source;
+
+  img.addEventListener('load',function() {
     // Now that the image has loaded, put the image into a canvas element.
     var canvas = d3.select('body').append('canvas').attr("id", "render-canvas").style("display", "none").node();
     canvas.width = width;
@@ -301,18 +364,17 @@ function render_image() {
 
     var canvasUrl = canvas.toDataURL("image/png");
 
-    // var img2 = d3.select('body').select("#render-final")
-    //   .node();
+    //console.log(canvasUrl)
 
     // this is now the base64 encoded version of our PNG! you could optionally
     // redirect the user to download the PNG by sending them to the url with
     // `window.location.href= canvasUrl`.
     // img2.src = canvasUrl;
     ajax_binary_image = canvasUrl
-  }
+  })
 
   // start loading the image.
-  img.src = url;
+  //img.src = url;
 }
 
 draw();

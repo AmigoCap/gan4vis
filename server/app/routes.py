@@ -31,10 +31,10 @@ def root_page():
 def index():
     token = request.args.get('token')
     app.logger.info("index token={}".format(token))
-    dict_transfer = {"token":"placeholder","model":"mosaic.pth","distribution":"random","datapoints":"","grid":"vertical","orientation":"up"}
+    dict_transfer = {"token":"placeholder","model":"mosaic.pth","distribution":"random","datapoints":"","grid":"vertical","orientation":"up","ratio":2}
     if token:
         transfer = Transfer.query.filter_by(token=token).first()
-        dict_transfer = {"token":transfer.token,"model":transfer.model,"distribution":transfer.distribution,"datapoints":transfer.datapoints,"grid":transfer.grid,"orientation":transfer.orientation}
+        dict_transfer = {"token":transfer.token,"model":transfer.model,"distribution":transfer.distribution,"datapoints":transfer.datapoints,"grid":transfer.grid,"orientation":transfer.orientation,"ratio":transfer.ratio}
     return render_template('index.html', title='GAN4VIS', dict_transfer=dict_transfer)
 
 
@@ -44,11 +44,12 @@ def treatment():
 
     ### 1 - Get the AJAX request and create the variable storing the data and the one storing the binary
     dictionary_request = request.get_json()
-    model = dictionary_request['model'] ## Save the model to apply
-    distribution = dictionary_request['distribution']
-    datapoints = dictionary_request['datapoints']
-    grid = dictionary_request['grid']
-    orientation = dictionary_request['orientation']
+    model = dictionary_request["model"] ## Save the model to apply
+    distribution = dictionary_request["distribution"]
+    datapoints = dictionary_request["datapoints"]
+    grid = dictionary_request["grid"]
+    orientation = dictionary_request["orientation"]
+    ratio = dictionary_request["ratio"]
 
     ### 2 - Prepare the input image
     app.logger.info("treatment token={} : IMAGE-INPUT START".format(token))
@@ -98,7 +99,7 @@ def treatment():
     t_image_output = t_image_output_start - time.time()
     app.logger.info("treatment token={} : IMAGE-OUTPUT END ({}s)".format(token,t_image_output))
 
-    t = Transfer(token = token, model = model, distribution = distribution, datapoints = datapoints, grid = grid, orientation = orientation)
+    t = Transfer(token = token, model = model, distribution = distribution, datapoints = datapoints, grid = grid, orientation = orientation, ratio = ratio)
     db.session.add(t)
     db.session.commit()
 
