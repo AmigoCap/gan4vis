@@ -15,9 +15,15 @@
 <div id="charts" class="container" style="width:100%; display: flex;justify-content: space-between">
 	<div id="preview" style="width:35%; float: left"></div>
 	<div id="submission" style="width:10%">
-		<input id="apply_style_button" class="btn btn-danger btn-lg" type="submit" value="Apply Style" style="width:100%;height:15%;padding: 0% 0% ;font-size:1.1vw;margin-top:100%">
+		<button id="apply_style_button" class="btn btn-danger btn-lg" type="submit" style="width:100%;height:15%;padding: 0% 0% ;margin-top:100%">
+			<div class="button_submission">Apply Style</div>
+		</button>
 		<img id="spinning_wheel" src="static/utilitaries_images/spinning.gif" style="width:40%;margin-top:10%; margin-left:30%; margin-right:30%;" hidden="hidden">
-		<a id="download_link" href="static/output_images/{{dict_transfer.token}}.jpg" download><button id="download_button" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;height:15%;padding: 0% 0% ;font-size:1.1vw;margin-top:10%;visibility:hidden"{% else %}style="width:100%;height:15%;padding: 0% 0% ;font-size:1.1vw;margin-top:10%;visibility:visible"{% endif %}><i class="fa fa-download"></i> Download</button></a>
+		<a id="download_link" href="static/output_images/{{dict_transfer.token}}.jpg" download>
+			<button id="download_button" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;height:15%;padding: 0% 0%;margin-top:10%;visibility:hidden"{% else %}style="width:100%;height:15%;padding: 0% 0% ;margin-top:10%;visibility:visible"{% endif %}>
+			  <div class="button_submission">Download</div>
+	    </button>
+    </a>
 	</div>
 	<div id="result" style="width:35%; float:right">
 		<img id="result_image" src="static/output_images/{{dict_transfer.token}}.jpg" style="width:100%;height:auto">
@@ -96,48 +102,48 @@
 		<table style="width:100%; table-layout: fixed">
 			<tr>
 				<td style="width:14%">
-					<h5 style="font-size:1.8vw; text-align:left">Team</h5>
+					<div class="collaborators_title">Team</div>
 				</td>
 				<td style="width:5%">
 					<a class="fa fa-linkedin" target="_blank" href="https://www.linkedin.com/in/charles-dupuy-2a90b513b/" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
 				</td>
 				<td style="width:16.5%">
-					<h5 style="font-size:1.2vw; text-align:left">Charles Dupuy</h5>
+					<div class="collaborators_name">Charles Dupuy</div>
 				</td>
 				<td style="width:5%">
 					<a class="fa fa-github" target="_blank" href="https://github.com/guillaume-lesaine" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
 				</td>
 				<td style="width:16.5%">
-					<h5 style="font-size:1.2vw; text-align:left">Guillaume Lesaine</h5>
+					<div class="collaborators_name">Guillaume Lesaine</div>
 				</td>
 				<td style="width:5%">
 					<a class="fa fa-github" target="_blank" href="https://github.com/clevecque" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
 				</td>
 				<td style="width:16.5%">
-					<h5 style="font-size:1.2vw; text-align:left">Clémence Lévêcque</h5>
+					<div class="collaborators_name">Clémence Lévêcque</div>
 				</td>
 				<td style="width:5%">
 					<a class="fa fa-linkedin" target="_blank" href="https://www.linkedin.com/in/william-pierre-93458a11b/" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
 				</td>
 				<td style="width:16.5%">
-					<h5 style="font-size:1.2vw; text-align:left">William Pierré</h5>
+					<div class="collaborators_name">William Pierré</div>
 				</td>
 			</tr>
 			<tr>
 				<td style="width:14%">
-					<h5 style="font-size:1.8vw; text-align:left">Supervisors</h5>
+					<div class="collaborators_title">Supervisors</div>
 				</td>
 				<td style="width:5%">
 					<a class="fa fa-github" target="_blank" href="https://github.com/Theo-Jaunet" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
 				</td>
 				<td style="width:16.5%">
-					<h5 style="font-size:1.2vw;text-align:left">Théo Jaunet</h5>
+					<div class="collaborators_name">Théo Jaunet</div>
 				</td>
 				<td style="width:5%">
 					<a class="fa fa-desktop" target="_blank" href="http://romain.vuillemot.net/" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
 				</td>
 				<td style="width:16.5%">
-					<h5 style="font-size:1.2vw;text-align:left">Romain Vuillemot</h5>
+					<div class="collaborators_name">Romain Vuillemot</div>
 				</td>
 			</tr>
 		</table>
@@ -153,6 +159,6 @@
 </script>
 <script src="{{url_for('static', filename="scripts/d3.js")}}"></script>
 <script src="{{url_for('static', filename="scripts/d3-gridding.js")}}"></script>
-<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/keys.css')}}">
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/styles.css')}}">
 <script src="{{url_for('static', filename="scripts/processing_index.js")}}"></script>
 {% endblock %}

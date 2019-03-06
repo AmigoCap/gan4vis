@@ -1,5 +1,49 @@
 /* https://codepen.io/rizky_k_r/pen/wospJ*/
 
+/* 1680px =< Big screens */
+/* 992px =< Medium screens  < 1679px */
+/* Small screens  < 992px */
+
+/* Big screens */
+@media all and (min-width : 1680px) {
+  div.button_submission
+  {
+    font-size:0.8vw;
+  }
+  div.button_label
+  {
+    font-size:0.5vw;
+  }
+  div.collaborators_title
+  {
+    font-size:1.2vw;
+  }
+  div.collaborators_name
+  {
+    font-size:0.9vw;
+  }
+}
+
+/* Medium screens */
+@media all and (max-width: 1679px) {
+  div.button_submission
+  {
+    font-size:1.1vw;
+  }
+  div.button_label
+  {
+    font-size:0.9vw;
+  }
+  div.collaborators_title
+  {
+    font-size:1.8vw;
+  }
+  div.collaborators_name
+  {
+    font-size:1.2vw;
+  }
+}
+
 @media all and (min-width: 992px) {
   div.key
   {
@@ -44,6 +88,7 @@
   }
 }
 
+/* Small screens */
 @media all and (max-width: 991px) {
   div.key
   {
@@ -86,6 +131,18 @@
     cursor: pointer;
     background-color: white;
   }
+}
+
+div.collaborators_name
+{
+  text-align:left;
+}
+
+div.collaborators_title
+{
+  text-align:left;
+  margin-top:4%;
+  margin-bottom:4%
 }
 
 div.button
