@@ -31,7 +31,7 @@ def root_page():
 def index():
     token = request.args.get('token')
     app.logger.info("index token={}".format(token))
-    dict_transfer = {"token":"placeholder","model":"mosaic.pth","distribution":"random","datapoints":"","grid":"vertical","orientation":"up","ratio":2}
+    dict_transfer = {"token":"placeholder","model":"mosaic.pth","distribution":"random","datapoints":"","grid":"vertical","orientation":"up","ratio":2} # Start ratio at 2 to be able to activate both zooms on page load
     if token:
         transfer = Transfer.query.filter_by(token=token).first()
         dict_transfer = {"token":transfer.token,"model":transfer.model,"distribution":transfer.distribution,"datapoints":transfer.datapoints,"grid":transfer.grid,"orientation":transfer.orientation,"ratio":transfer.ratio}
@@ -110,7 +110,13 @@ def treatment():
 def process():
     return render_template('process.html', title='GAN4VIS - Process')
 
+@app.route('/dashboard')
+def dashboard():
+    transfers = []
+    for transfer in Transfer.query.all():
+        transfers.append({"token":transfer.token,"date":transfer.date,"model":transfer.model,"distribution":transfer.distribution,"datapoints":transfer.datapoints,"grid":transfer.grid,"orientation":transfer.orientation,"ratio":transfer.ratio})
+    return render_template('dashboard.html', title='Dashboard', transfers=transfers)
+
 @app.route('/preview/<token>.jpg')
 def preview(token):
-    print(token)
     return send_file("./static/output_images/{}.jpg".format(token), mimetype='image/jpg')
