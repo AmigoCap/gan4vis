@@ -13,7 +13,7 @@ var draw_line_chart_submission = function(table){
   var parseDate = d3.timeParse("%m/%d/%Y")
   var width = document.getElementById("line_chart_submission").offsetWidth
   var height = document.getElementById("line_chart_submission").offsetWidth*1/2
-  var margin = {"left":25,"right":25,"top":40,"bottom":40}
+  var margin = {"left":35,"right":25,"top":40,"bottom":40}
 
   var svg = d3.select("#line_chart_submission")
     .append("svg")
@@ -66,7 +66,7 @@ var draw_line_chart_submission = function(table){
     .datum(cumulated_values)
     .attr('fill', 'none')
     .attr("stroke", "steelblue")
-    .attr('stroke-width', 3)
+    .attr('stroke-width', width/250)
     .attr("d", line)
 
   svg.append("g")
@@ -89,7 +89,7 @@ var draw_line_chart_submission = function(table){
 var draw_combination_chart = function(table){
   var width = document.getElementById("chart_combination").offsetWidth
   var height = document.getElementById("chart_combination").offsetWidth*3/4
-  var margin = {"left":95,"right":25,"top":40,"bottom":40}
+  var margin = {"left":110,"right":10,"top":40,"bottom":40}
 
   var svg = d3.select("#chart_combination")
     .append("svg")
@@ -138,7 +138,7 @@ var draw_combination_chart = function(table){
 
   var rScale = d3.scaleLinear()
     .domain([0,d3.max(grouped_data,function(d){return d.value})])
-    .range([0,30])
+    .range([0,width/15])
 
   var xAxis = d3.axisBottom()
     .scale(xScale)
@@ -194,13 +194,13 @@ var draw_combination_chart = function(table){
     .append("text")
     .attr("x",margin.left)
     .attr("y", margin.top*5/8)
-    .text("Grid - Distribution Popularity");
+    .text("Grid / Distribution Popularity");
 }
 
 var draw_bar_chart = function(table,id_div,key_name,type,title){
   var width = document.getElementById(id_div).offsetWidth
   var height = document.getElementById(id_div).offsetWidth*11/16
-  var margin = {"left":25,"right":25,"top":25,"bottom":25}
+  var margin = {"left":35,"right":25,"top":25,"bottom":25}
 
   var svg = d3.select("#"+id_div)
     .append("svg")
@@ -241,8 +241,18 @@ var draw_bar_chart = function(table,id_div,key_name,type,title){
     .domain([0, d3.max(nested_table, d => d.value)])
     .range([height-margin.top,margin.bottom])
 
+
   var xAxis = d3.axisBottom()
     .scale(xScale)
+
+  // Only show a x tick every four tick
+  if (key_name === "number_points"){
+    l = d3.range(d3.min(nested_table, d => +d.key), d3.max(nested_table, d => +d.key)+1)
+    xAxis.tickValues(l.filter(function(d,i){
+      return i%5 === 0
+    }))
+  }
+
 
   var yAxis = d3.axisLeft()
     .scale(yScale)
