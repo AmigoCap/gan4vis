@@ -115,7 +115,7 @@ def dashboard():
     transfers = []
     for transfer in Transfer.query.all():
         transfers.append({"token":transfer.token,"date":transfer.date,"model":transfer.model,"distribution":transfer.distribution,"datapoints":transfer.datapoints,"grid":transfer.grid,"orientation":transfer.orientation,"ratio":transfer.ratio})
-    return render_template('dashboard.html', title='Dashboard', transfers=transfers)
+    return render_template('dashboard.html', title='GAN4VIS - Dashboard', transfers=transfers)
 
 @app.route('/preview/<token>.jpg')
 def preview(token):

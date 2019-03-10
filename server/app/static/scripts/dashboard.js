@@ -49,6 +49,7 @@ var draw_line_chart_submission = function(table){
     .range([height - margin.top,margin.bottom])
 
   var xAxis = d3.axisBottom()
+    .tickFormat(d3.timeFormat("%d %b"))
     .scale(xScale)
 
   var yAxis = d3.axisLeft()
@@ -84,6 +85,40 @@ var draw_line_chart_submission = function(table){
     .attr("x",margin.left)
     .attr("y", margin.top*5/8)
     .text("Style Transfer Applications");
+
+  var tooltip = d3.select("#line_chart_submission").append('div')
+    .attr('class', 'hidden tooltip');
+
+  svg.selectAll("circle")
+    .data(cumulated_values)
+    .enter()
+    .append("circle")
+    .attr("cx",function(d){
+      return xScale(parseDate(d.date))
+    })
+    .attr("cy",function(d){
+      return yScale(d.sum)
+    })
+    .attr("r",width/175)
+    .attr("fill", "steelblue")
+    .on('mousemove', function(d) {
+      var mouse = d3.mouse(d3.select("#line_chart_submission").node()).map(function(d) {
+        return parseInt(d);
+      });
+      tooltip.classed('hidden', false)
+        .style("top", (d3.event.pageY) - width/20 + "px")
+        .style("left", (d3.event.pageX) + width/75 + "px")
+        .style("width","auto")
+        .html(d.date + ": <b>" + d.sum +"</b>");
+
+      d3.select(this)
+          .attr("fill", "orange");
+    })
+    .on('mouseout', function() {
+      d3.select(this)
+          .attr("fill", "steelblue");
+      tooltip.classed('hidden', true);
+    });
 }
 
 var draw_combination_chart = function(table){
@@ -169,7 +204,7 @@ var draw_combination_chart = function(table){
         .style("top", (d3.event.pageY) - width/12 + "px")
         .style("left", (d3.event.pageX) + width/50 + "px")
         .style("width","auto")
-        .html(d.value);
+        .html(d.grid + " + " + d.distribution + ": <b>"+ d.value + "</b>");
 
       d3.select(this)
           .attr("fill", "orange");
@@ -248,8 +283,8 @@ var draw_bar_chart = function(table,id_div,key_name,type,title){
   // Only show a x tick every four tick
   if (key_name === "number_points"){
     l = d3.range(d3.min(nested_table, d => +d.key), d3.max(nested_table, d => +d.key)+1)
-    xAxis.tickValues(l.filter(function(d,i){
-      return i%5 === 0
+    xAxis.tickValues(l.filter(function(d){
+      return d%5 === 0 // Only display tick values like 0, 5, 10, ...
     }))
   }
 
@@ -278,7 +313,7 @@ var draw_bar_chart = function(table,id_div,key_name,type,title){
         .style("top", (d3.event.pageY) - width/12 + "px")
         .style("left", (d3.event.pageX) + width/70 + "px")
         .style("width","auto")
-        .html(d.value);
+        .html(d.key + ": <b>"+ d.value + "</b>");
 
       d3.select(this)
           .attr("fill", "orange");

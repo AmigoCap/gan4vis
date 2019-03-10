@@ -3,11 +3,11 @@
 }
 div.tooltip {
     color: #222;
-    background-color: #fff;
+    background-color: #dae7f1;
     padding: .5em;
     text-shadow: #f5f5f5 0 1px 0;
     border-radius: 2px;
-    opacity: 0.9;
+    opacity: 1;
     position: absolute;
     font-size: 1.0vw;
 }
