@@ -120,3 +120,7 @@ def dashboard():
 @app.route('/preview/<token>.jpg')
 def preview(token):
     return send_file("./static/output_images/{}.jpg".format(token), mimetype='image/jpg')
+
+@app.route('/transitions')
+def transition():
+    return render_template('transitions.html', title='GAN4VIS - Transitions')
