@@ -1,10 +1,20 @@
+// Image Style selection
+image_style_selected = transfer.model
+
+var image_click = function(image){
+   $('.selected').removeClass('selected'); // removes the previous selected class
+   $(image).addClass('selected'); // adds the class to the clicked image
+   image_style_selected = document.getElementsByClassName("image_style selected")[0].id
+};
+
+// AJAX Query
 $("#apply_style_button").on("touchstart click",function() {
   $.ajax({
     url: "/treatment",
     type: "POST",
     data: JSON.stringify({
       "image": ajax_binary_image, // Send the binary of the input chart image
-      "model": $("input:radio[name ='selection_model']:checked").val(), // Send the chosen model
+      "model": image_style_selected,//$("input:radio[name ='selection_model']:checked").val(), // Send the chosen model
       "distribution": current_distribution,
       "datapoints": data.join(','),
       'grid': gridding.mode(),
@@ -13,11 +23,11 @@ $("#apply_style_button").on("touchstart click",function() {
     }),
     contentType: "application/json; charset=utf-8",
     beforeSend: function() {
-      document.getElementById("download_button").style.visibility = "hidden" //hidden the download option
-      $('#spinning_wheel').show();    /*showing  a div with spinning image */
+      //document.getElementById("download_button").style.visibility = "hidden" //hidden the download option
+      document.getElementById("spinning_wheel").style.visibility = "visible";    /*showing  a div with spinning image */
     },
     success: function(response) {
-      $('#spinning_wheel').hide();
+      document.getElementById("spinning_wheel").style.visibility = "hidden";
       document.getElementById("download_button").style.visibility = "visible" //show the download option
       $("#result_image").attr("src", "static/output_images/" + response + ".jpg") //Update the result image
       document.getElementById('download_link').setAttribute("href","static/output_images/" + response + ".jpg") //Update the download target
@@ -96,7 +106,7 @@ var change_grid = function() {
 }
 
 var change_orientation = function() {
-  var o = ["up", "down", "left", "right"]; // , "top right"
+  var o = ["up", "down"]; // , "top right"
   var new_orient = o[(o.indexOf(gridding.orient()) + 1) % o.length];
   gridding.orient(new_orient);
   console.log("new orient: ", gridding.orient());
@@ -243,9 +253,37 @@ d3.select("body")
 var svg = d3.select("#preview")
   .append("svg")
   .attr("id", "svg_preview")
+  .attr("xmlns","http://www.w3.org/2000/svg")
   .attr("viewBox", "0 0 " + width + " " + height)
   .attr("perserveAspectRatio", "xMinYMid")
 
+// svg.append('svg:image')
+//   .attr("xlink:href","http://www.iconpng.com/png/beautiful_flat_color/computer.png")
+//   .attr("x",0)
+//   .attr("y",0)
+//   .attr("width",200)
+//   .attr("height",200);
+
+// var max = { x: 230, y: 152}
+// var imgUrl = "http://thedali.org/wp-content/uploads/2015/04/main_feature_image.png";
+//
+// svg.append("defs")
+//     .append("pattern")
+//     .attr("id", "venus")
+//     .attr('patternUnits', 'userSpaceOnUse')
+//     .attr("width", max.x)
+//     .attr("height", max.y)
+//     .append("image")
+//     .attr("xlink:href", imgUrl)
+//     .attr("width", max.x)
+//     .attr("height", max.y);
+//
+// svg.append("rect")
+//     .attr("x", "0")
+//     .attr("y", "0")
+//     .attr("width", max.x)
+//     .attr("height", max.y)
+//     .attr("fill", "url(#venus)");
 
 function draw() {
   var griddingData = gridding(data);
@@ -318,11 +356,15 @@ function render_image() {
   d3.select("#render-canvas").remove();
   d3.select("#render-img").remove();
 
+  // console.log(d3.select('svg').node())
+
   // serialize our SVG XML to a string.
   var source = (new XMLSerializer()).serializeToString(d3.select('svg').node());
 
   source = source.replace('viewBox="0 0 450 300"', 'width="' + width + 'px"') //Tinkering with string to remove the effect of responsive
   source = source.replace('perserveAspectRatio="xMinYMid"', 'height="' + height + 'px"')
+
+  source.replace()
 
   var doctype = '<?xml version="1.0" standalone="no"?>' +
     '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
@@ -353,6 +395,9 @@ function render_image() {
   var img = new Image();
   img.src = 'data:image/svg+xml;utf8,' + doctype + source;
 
+  // console.log('data:image/svg+xml;utf8,' + doctype + source)
+  // console.log(img.src)
+
   img.addEventListener('load',function() {
     // Now that the image has loaded, put the image into a canvas element.
     var canvas = d3.select('body').append('canvas').attr("id", "render-canvas").style("display", "none").node();
@@ -364,7 +409,7 @@ function render_image() {
 
     var canvasUrl = canvas.toDataURL("image/png");
 
-    //console.log(canvasUrl)
+    // console.log(canvasUrl)
 
     // this is now the base64 encoded version of our PNG! you could optionally
     // redirect the user to download the PNG by sending them to the url with

@@ -194,3 +194,15 @@ center > h4 { color: #c5c5c5; margin-top: 50px; }
     ul#keys-freebie > li { float: left; margin-right: 20px; margin-bottom: 20px; padding: 10px 10px; }
     ul#keys-freebie > li:last-child { margin-right: 0; }
     ul#keys-freebie > li > span { margin-bottom: 10px; }
+
+.image_style{
+  border:0.4vw solid white;
+}
+
+.selected{
+  border:0.4vw solid #28a645;
+}
+
+/* svg {
+  background: url('https://www.google.nl/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png') no-repeat;
+} */
