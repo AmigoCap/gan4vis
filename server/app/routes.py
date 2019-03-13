@@ -121,6 +121,52 @@ def dashboard():
 def preview(token):
     return send_file("./static/output_images/{}.jpg".format(token), mimetype='image/jpg')
 
+
+@app.route('/treatment_transitions', methods=['GET','POST'])
+def treatment_transitions():
+    token = str(uuid.uuid4())
+    
+    ### 1 - Get the AJAX request and create the variable storing the data and the one storing the binary
+    dictionary_request = request.get_json()
+    bin_image = dictionary_request["image"]
+
+    ### 2 - Prepare the input image
+    app.logger.info("transition_creation token={} : IMAGE-INPUT START".format(token))
+    t_image_input_start = time.time()
+    
+    # A2B : Transform the image into binaries
+    binary_data = a2b_base64(dictionary_request['image'].split('base64,')[1])
+
+    # Transform binary data to PIL format (Step could be avoided if we find something like "Image.froma")
+    dataBytesIO = BytesIO(binary_data)
+    png = Image.open(dataBytesIO)
+    
+    t_image_input = time.time() - t_image_input_start
+    app.logger.info("transition_creation token={} : IMAGE-INPUT END ({}s)".format(token,t_image_input))
+    
+    ### 3 - Run the style transfer using the GAN chosen in model
+
+    app.logger.info("transition_creation token={} : GENERATION START".format(token))
+    t_creation_start = time.time()
+
+    transition_result = none # TODO: Call Wills' function
+
+    t_creation = time.time() - t_creation_start
+    app.logger.info("transition_creation token={} : GENERATION END ({}s)".format(token,t_creation))
+
+    ### 4 - Prepare the output image, transform image from PIL to bytes and then to image for the interface
+
+    app.logger.info("treatment token={} : IMAGE-OUTPUT START".format(token))
+    t_image_output_start = time.time()
+
+    transition_result.save("./app/static/output_images/{}.jpg".format(token), format='JPEG')
+
+    t_image_output = t_image_output_start - time.time()
+    app.logger.info("treatment token={} : IMAGE-OUTPUT END ({}s)".format(token,t_image_output))
+    
+    # Return the content of the output to the client with AJAX
+    return(token)
+    
 @app.route('/transitions')
 def transition():
     return render_template('transitions.html', title='GAN4VIS - Transitions')
