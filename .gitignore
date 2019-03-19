@@ -1,0 +1,11 @@
+*.pth
+server/migrations
+server/app/static/db_files
+server/app/static/prediction_temp
+server/gan4vis_heroku_virtual_env
+*.jpg
+*.png
+*.svg
+*.db
+*.pyc
+__pycache__

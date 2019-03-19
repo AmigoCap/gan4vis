@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+<h2 style="text-align:center">Building GAN4VIS</h2>
+<h3>Initial research</h3>
+
+<h4>GAN for visualization</h4>
+
+<p>
+The starting idea of our project was to use GANs (Generative Adversarial Networks), and more broadly deep learning, in the context of data visualization.
+
+
+<h4>First experiments</h4>
+
+<p>
+We started using various models to explore what deep learning could do to help visualization. We mainly tried to:
+<ul>
+  <li>Transform one visualization into an other</li>
+  <li>Automatically generate transitions between charts</li>
+  <li>Transfer style from one image onto a visualization</li>
+</ul>
+Below are some of our results. Left is the automated creation of bar charts from line charts. Right is the generation of transition images between bar charts and pie charts.
+</p>
+
+<div>
+<img src="static/utilitaries_images/transformation.jpg" style="float:left; margin-left: auto; margin-right: auto; width:50%">
+<img src="static/utilitaries_images/transition.jpg" style="float:left; margin-left: auto; margin-right: auto; width:50%">
+<h5 style="text-align:center">Figure 1 : First experiments involving the transformation of a chart and the generation of a transition.</h5>
+</div>
+
+<p>
+  After testing several kinds of models, we decided to go for the application of style transfer.
+</p>
+
+<h4>Style Transfer</h4>
+
+<p>
+  Visualization is not an easy task, even when creating simple charts, design often intersects with coding and storytelling difficulties. Creating a nice style is not an simple task either. So, making visualizations with style can quickly become a nightmare requiring the craft of a expert in visualization and a designer. We thus wanted to create a tool demonstrating how simple charts can be automatically stylized using deep learning.
+</p>
+
+<h4>First tries</h4>
+
+<p>
+  The first model we played around with was a simple pix2pix model. We wanted to see if there was some value into teaching the model to transform a simple visualization, into a more elaborate one. Our idea was to see if we could have a model learn what is the matplotlib or D3 visualization style. Below are some of our first results. On the left, we wanted to transform the matplotlib style into a simple D3 styled chart. On the right, we wanted to transform a raw D3 style into a fancier one.
+</p>
+
+<div>
+<img src="static/utilitaries_images/transfer_matplotlib.jpg" style="float:left; margin-left: auto; margin-right: auto; width:50%">
+<img src="static/utilitaries_images/transfer_d3.jpg" style="float:left; margin-left: auto; margin-right: auto; width:50%">
+<h5 style="text-align:center">Figure 2 : Style transfer results to transform the matplotlib style into a simple D3 chart, and raw D3 style toward fancy D3 style</h5>
+</div>
+
+<p>
+  As we can see, a simple pix2pix was succesful at identifying the features of a matplotlib chart and transform them into features of a D3 chart. The same goes for a raw D3 chart to a fancier one with colors.
+</p>
+
+<h3>Building the platform</h3>
+
+<p>
+  We knew from the start that we wanted a web platform to have people use our tool. We also wanted something interactive and fun. We built our tool around two pieces.
+</p>
+
+<h4>Interface - D3 gridding</h4>
+
+<p>
+  We first needed inputs for our system. We wanted everyone to be able to use the platform, not only people with visualization generation skills. This is why we settled for an interactive interface built in JavaScript. We used <a href="https://github.com/romsson/d3-gridding" target="_blank">d3-gridding</a>, a D3 module, written by <a href="http://romain.vuillemot.net/" target="_blank">Romain Vuillemot</a>, to create our visualization generator.
+</p>
+
+<h4>Treatment - Fast Neural Style</h4>
+
+<p>
+  Once our input generated, we needed a model to transfer styles on them. We discovered a great model from PyTorch, originally created for paintings, that we used <a href="https://github.com/pytorch/examples/tree/master/fast_neural_style" target="_blank">fast_neural_style</a>.
+</p>
+
+<h3>Experimentations</h3>
+
+<p>
+  Once the platform built, here were the first results we came up with.
+</p>
+
+<div style="width:100%">
+<img src="static/utilitaries_images/mosaic_simple.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/pollock_simple.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/udnie_simple.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/map_simple.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<h5 style="text-align:center; margin-top:10px">Figure 3 : Original outputs using simple visualization as model inputs</h5>
+</div>
+
+<p>
+  In this first case, we directly fed the image you can see on the interface to the model. We did not like the fact that far from the chart, basically nothing interesting happened. We thus needed to make some changes to the input after submission by the user.
+</p>
+
+<p>
+  In order to improve those first results, we played around with the inputs to see how we could influence the style transfer. We mainly played on the background of the charts thus taking advantage of the lack of background of the PNG we export from the interface. Indeed, here is what the process on the server side looks like once you apply a style from the interface.
+</p>
+
+<div style="width:100%">
+<img src="static/utilitaries_images/process.jpg" style="display: block; margin-left: auto; margin-right: auto; width:70%">
+<h5 style="text-align:center">Figure 4 : Process on the server side of input transformation</h5>
+</div>
+
+<p>
+  Once sent to the server, the chart is preprocessed to have the right format. Then we import a new image, often the style image itself, to permform a special treatment which output will be fed to the style transfer model. The treatment we provide is quite simple. The style image undergoes a filter, depending on the user's choice, that can be a gaussian blur or an edge detection for instance (treatment 1, treatment 2, ...) [Only gaussian blur for now]. Then we paste the input from the interface onto the filtered style image. This results in the intput we then give to the model.
+</p>
+
+<p>
+  Here are some of the attempts we made to find cool background effects. We use the Python library Pillow for image treatment.
+</p>
+
+<div style="width:100%">
+<img src="static/utilitaries_images/mosaic_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/pollock_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/udnie_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/map_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<h5 style="text-align:center; margin-top:10px">Figure 5 : Style images as background with heavy gaussian blur (Pillow: r=100)</h5>
+</div>
+
+<div style="width:100%">
+<img src="static/utilitaries_images/mosaic_edge_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/pollock_edge_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/udnie_edge_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/map_edge_blur.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<h5 style="text-align:center; margin-top:10px">Figure 6 : Style images as background with edge detection and small gaussian blur (Pillow: r=7) </h5>
+</div>
+
+<div>
+<img src="static/utilitaries_images/mosaic_noise.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/pollock_noise.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/udnie_noise.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<img src="static/utilitaries_images/map_noise.jpg" style="float:left; margin-left: 2.5%; margin-right: 2.5%;margin-bottom: 2%;margin-top: 2%; width:20%">
+<h5 style="text-align:center; margin-top:10px">Figure 7 : White noise as a common background </h5>
+</div>
+
+We opted for a very heuristic method. The possibilities are infinite even without tinkering with the model. Here is a <a href="static/utilitaries_images/gan4vis_background_experiments.pdf" download>PDF document</a> with some of the tests we conducted based on the original models from PyTorch.
+
+<h3>More use cases for visualizations ...</h3>
+
+<p>
+  We said at the beginning that we looked for an application of deep learning in the field of visualization. We found one. Yet our first experiments led us to believe that there was something to do around transitions. Indeed, transitions between visualization are difficult to imagine and horribly tedious to implement. This is why some of us have been working on this transition implementation in parallel. To be continued.
+</p>
+{% endblock %}
