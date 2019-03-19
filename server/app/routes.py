@@ -149,7 +149,9 @@ def treatment_transitions():
     app.logger.info("transition_creation token={} : GENERATION START".format(token))
     t_creation_start = time.time()
 
-    transition_result = none # TODO: Call Wills' function
+    transition_result = Image.new("RGB", png.size, (255, 255, 255))
+    transition_result.paste(png, mask=png.split()[3])
+    #transition_result = png # TODO: Call Wills' function
 
     t_creation = time.time() - t_creation_start
     app.logger.info("transition_creation token={} : GENERATION END ({}s)".format(token,t_creation))
@@ -169,4 +171,7 @@ def treatment_transitions():
     
 @app.route('/transitions')
 def transition():
-    return render_template('transitions.html', title='GAN4VIS - Transitions')
+    token = request.args.get('token')
+    app.logger.info("index token={}".format(token))
+    dict_transfer = {"token":"placeholder"}
+    return render_template('transitions.html', title='GAN4VIS - Transitions', dict_transfer=dict_transfer)
