@@ -6,31 +6,45 @@
 
 {% block app_content %}
 
-<div id="title" class="container" style="width:100%; margin-bottom:3%">
+<div id="title" class="container" style="width:100%; margin-bottom:1%; padding-left:0; padding-right:0;">
 	<div style="float: left; text-align:center; width: 100%">
 		<h1 style="font-size:2.3vw;margin-top:1%">GAN4VIS</h1>
 		<p style="font-size:1.2vw;">Create your chart and style it with deep learning!</p>
 	</div>
 </div>
-<div id="charts" class="container" style="width:100%; display: flex;justify-content: space-between">
-	<div id="preview" style="width:35%; float: left"></div>
-	<div id="submission" style="width:10%">
-		<button id="apply_style_button" class="btn btn-danger btn-lg" type="submit" style="width:100%;height:15%;padding: 0% 0% ;margin-top:100%">
+<div id="titles" class="container" style="width:100%; display: flex;justify-content: space-between; margin-bottom:0.5%; padding-left:0; padding-right:0;">
+		<div id="title_preview" style="width:35%; float: left; font-size:1.2vw; text-align:center;margin-left:7.5%;margin-right:7.5%;font-weight: bold">Visualization</div>
+		<div id="title_result" style="width:35%; float:right; font-size:1.2vw; text-align:center;margin-left:7.5%;margin-right:7.5%;font-weight: bold">Stylized Visualization</div>
+</div>
+<div id="charts" class="container" style="width:100%; height:auto; display: flex;justify-content: space-between; padding-left:0; padding-right:0;">
+	<div id="choice_background" style="width:7.5%; float: left"></div>
+	<div id="preview" style="width:35%; height:auto; float: left"></div>
+	<div id="submission" style="width:10%; height:auto; margin-left:2.5%; margin-right:2.5%;display:flex;flex-direction:column;justify-content:center">
+		<div style="width:40%;margin-left:30%; margin-right:30%"><i class="fa fa-long-arrow-right" style="font-size:3.5vw;color:#d9534f"></i></div>
+		<button id="apply_style_button" class="btn btn-danger btn-lg" type="submit" style="width:100%;padding: 10% 0% ;float:left;margin-top:10%;margin-bottom:10%">
 			<div class="button_submission">Apply Style</div>
 		</button>
-		<img id="spinning_wheel" src="static/utilitaries_images/spinning.gif" style="width:40%;margin-top:10%; margin-left:30%; margin-right:30%;" hidden="hidden">
-		<a id="download_link" href="static/output_images/{{dict_transfer.token}}.jpg" download>
-			<button id="download_button" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;height:15%;padding: 0% 0%;margin-top:10%;visibility:hidden"{% else %}style="width:100%;height:15%;padding: 0% 0% ;margin-top:10%;visibility:visible"{% endif %}>
-			  <div class="button_submission">Download</div>
-	    </button>
-    </a>
+		<img id="spinning_wheel" src="static/utilitaries_images/spinning.gif" style="width:40%; margin-left:30%; margin-right:30%;visibility:hidden">
 	</div>
-	<div id="result" style="width:35%; float:right">
+	<div id="result" style="width:35%; height:auto; float:right">
 		<img id="result_image" src="static/output_images/{{dict_transfer.token}}.jpg" style="width:100%;height:auto">
 	</div>
+	<div id="output_options" style="width:5%; float: left; margin-left:2.5%;display:flex;flex-direction:column;justify-content:space-evenly">
+		<button id="" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;padding: 0% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:hidden"{% endif %}>
+			<div class="button_submission"><i class="fa fa-download" aria-hidden="true"></i></div>
+		</button>
+		<a id="download_link" href="static/output_images/{{dict_transfer.token}}.jpg" download>
+			<button id="download_button" class="btn btn-primary btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;padding: 20% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:visible;"{% endif %}>
+				<div class="button_submission"><i class="fa fa-download" aria-hidden="true"></i></div>
+			</button>
+		</a>
+		<button id="" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;padding: 0% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:hidden"{% endif %}>
+			<div class="button_submission"><i class="fa fa-download" aria-hidden="true"></i></div>
+		</button>
+	</div>
 </div>
-<div id="selection" class="container" style="width:100%; margin-top:1%;margin-bottom:3%; display: flex;justify-content: space-between">
-	<div id="interface_keys" style="width:35%; float: left; height:30%;">
+<div id="selection" class="container" style="width:100%; margin-top:1%;margin-bottom:3%; display: flex;justify-content: space-between; padding-left:0; padding-right:0;">
+	<div id="interface_keys" style="width:35%; float: left; height:30%;margin-left:7.5%;margin-right:7.5%">
 		<table style="width:100%; table-layout: fixed">
 			<tr>
 				<td style="width: 25%">
@@ -42,12 +56,12 @@
 					<div class="button_label"> Randomize </div>
 				</td>
 				<td style="width: 25%">
-					<div id="key_add" class="key"><span>D+</span></div>
-					<div class="button_label">Add data</div>
-				</td>
-				<td style="width: 25%">
 					<div id="key_remove" class="key"><span>D-</span></div>
 					<div class="button_label">Remove data</div>
+				</td>
+				<td style="width: 25%">
+					<div id="key_add" class="key"><span>D+</span></div>
+					<div class="button_label">Add data</div>
 				</td>
 			</tr>
 			<tr>
@@ -60,44 +74,36 @@
 					<div class="button_label">Orientation</div>
 				</td>
 				<td style="width: 25%">
-					<div id="key_ratio_increase" class="key"><span>Z+</span></div>
-					<div class="button_label">Zoom</div>
-				</td>
-				<td style="width: 25%">
 					<div id="key_ratio_decrease" class="key"><span>Z-</span></div>
 					<div class="button_label">Unzoom</div>
+				</td>
+				<td style="width: 25%">
+					<div id="key_ratio_increase" class="key"><span>Z+</span></div>
+					<div class="button_label">Zoom</div>
 				</td>
 			</tr>
 		</table>
 	</div>
-	<div id="save" style="width:10%; height:30%; float:left;display: flex;align-items: center;justify-content: center;">
-	</div>
-	<div id="interface_gans" style="width:35%; float: right; height:30%;">
+	<div id="interface_gans" style="width:35%; float: right; height:30%;margin-left:7.5%;margin-right:7.5%">
 		<table style="width:100%; table-layout: fixed">
 			<tr>
-				<td style="width: 50%; padding-bottom: 5px">
-					<img src="static/utilitaries_images/mosaic.jpg" width="40%">
-					<input type="radio" name="selection_model" value="mosaic.pth" style="width:15px" {% if dict_transfer.model=="mosaic.pth" %}checked="checked"{% endif %}>
+				<td style="width: 25%">
+					<img id="mosaic.pth" src="static/utilitaries_images/mosaic.jpg" {% if dict_transfer.model=="mosaic.pth" %} class="image_style selected" {% else %} class="image_style" {% endif %} onclick="image_click(this)" width="80%">
 				</td>
-				<td style="width: 50%; padding-bottom: 5px">
-					<img src="static/utilitaries_images/map.jpg" width="40%">
-					<input type="radio" name="selection_model" value="map.pth" style="width:15px" {% if dict_transfer.model=="map.pth" %}checked="checked"{% endif %}>
+				<td style="width: 25%">
+					<img id="map.pth" src="static/utilitaries_images/map.jpg" {% if dict_transfer.model=="map.pth" %}class="image_style selected" {% else %} class="image_style" {% endif %} onclick="image_click(this)" width="80%">
 				</td>
-			</tr>
-			<tr>
-				<td style="width: 50%">
-					<img src="static/utilitaries_images/pollock.jpg" width="40%">
-					<input type="radio" name="selection_model" value="pollock.pth" style="width:15px" {% if dict_transfer.model=="pollock.pth" %}checked="checked"{% endif %}>
+				<td style="width: 25%">
+					<img id="pollock.pth" src="static/utilitaries_images/pollock.jpg" {% if dict_transfer.model=="pollock.pth" %} class="image_style selected" {% else %} class="image_style" {% endif %} onclick="image_click(this)" width="80%">
 				</td>
-				<td style="width: 50%">
-					<img src="static/utilitaries_images/udnie.jpg" width="40%">
-					<input type="radio" name="selection_model" value="udnie.pth" style="width:15px" {% if dict_transfer.model=="udnie.pth" %}checked="checked"{% endif %}>
+				<td style="width: 25%">
+					<img id="udnie.pth" src="static/utilitaries_images/udnie.jpg" {% if dict_transfer.model=="udnie.pth" %} class="image_style selected" {% else %} class="image_style" {% endif %} onclick="image_click(this)" width="80%">
 				</td>
 			</tr>
 		</table>
 	</div>
 </div>
-<div id="background" class="container" style="width:100%; margin-top:2%;margin-bottom:2%">
+<div id="background" class="container" style="width:100%; margin-top:2%;margin-bottom:2%;">
 	<div id="team" style="float: left; width: 100%">
 		<table style="width:100%; table-layout: fixed">
 			<tr>
