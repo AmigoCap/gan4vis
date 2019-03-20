@@ -86,7 +86,7 @@ $("#create_transition_button").on("touchstart click",function() {
     success: function(response) {
       $('#spinning_wheel').hide();
       document.getElementById("download_button").style.visibility = "visible" //show the download option
-      $("#result_image").attr("src", "static/output_images/" + response + ".jpg") //Update the result image
+      $("#result_image").attr("src", "static/output_images/" + response + ".gif") //Update the result image
       document.getElementById('download_link').setAttribute("href","static/output_images/" + response + ".jpg") //Update the download target
       history.pushState(window.location.href, "index", "?token=" + response)
     }
