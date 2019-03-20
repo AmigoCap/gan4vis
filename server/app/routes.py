@@ -1,6 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, send_file
 from app import app, db
 from app.models import Transfer
+from .gan.transition import interpol
 from binascii import a2b_base64, b2a_base64
 import re
 import os, sys, inspect
@@ -149,9 +150,20 @@ def treatment_transitions():
     app.logger.info("transition_creation token={} : GENERATION START".format(token))
     t_creation_start = time.time()
 
-    transition_result = Image.new("RGB", png.size, (255, 255, 255))
-    transition_result.paste(png, mask=png.split()[3])
-    #transition_result = png # TODO: Call Wills' function
+    png_wo_alpha = Image.new("RGB", png.size, (255, 255, 255))
+    png_wo_alpha.paste(png, mask=png.split()[3])
+
+    transition_dict = {}
+    transition_dict['begin_path'] = os.path.join(os.path.dirname(__file__),
+                                                 'static', 'utilitaries_images',
+                                                 'transition_begin.jpg')
+    transition_dict['end_path'] = os.path.join(os.path.dirname(__file__),
+                                                 'static', 'utilitaries_images',
+                                                 'transition_end.jpg')
+    
+    transition_dict['user_canvas'] = png_wo_alpha
+
+    transition_result = interpol(transition_dict) # TODO: Call Wills' function
 
     t_creation = time.time() - t_creation_start
     app.logger.info("transition_creation token={} : GENERATION END ({}s)".format(token,t_creation))
@@ -161,7 +173,9 @@ def treatment_transitions():
     app.logger.info("treatment token={} : IMAGE-OUTPUT START".format(token))
     t_image_output_start = time.time()
 
-    transition_result.save("./app/static/output_images/{}.jpg".format(token), format='JPEG')
+    transition_result[0].save("./app/static/output_images/{}.gif".format(token),
+                            format='GIF', save_all=True, append_images=transition_result[1:],
+                            duration=1, loop=10)
 
     t_image_output = t_image_output_start - time.time()
     app.logger.info("treatment token={} : IMAGE-OUTPUT END ({}s)".format(token,t_image_output))
