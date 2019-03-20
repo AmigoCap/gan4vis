@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+<div id="title" class="container" style="width:100%; margin-bottom:3%">
+	<div style="float: left; text-align:center; width: 100%">
+		<h1 style="font-size:2.3vw;margin-top:1%">GAN4VIS</h1>
+		<p style="font-size:1.2vw;">Create your own custom transition!</p>
+	</div>
+</div>
+
+<div id="charts" class="container" style="width:100%; display: flex;justify-content: space-between">
+  <p>Sketching area:</p>
+  <div id="canvasDivId" style="width:35%; float: left"></div>
+	<div id="submission" style="width:10%">
+		<button id="create_transition_button" class="btn btn-danger btn-lg" type="submit" style="width:100%;height:15%;padding: 0% 0% ;margin-top:100%">
+			<div class="button_submission">Create Transition</div>
+		</button>
+		<img id="spinning_wheel" src="static/utilitaries_images/spinning.gif" style="width:40%;margin-top:10%; margin-left:30%; margin-right:30%;" hidden="hidden">
+		<a id="download_link" href="static/output_images/{{dict_transfer.token}}.jpg" download>
+			<button id="download_button" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;height:15%;padding: 0% 0%;margin-top:10%;visibility:hidden"{% else %}style="width:100%;height:15%;padding: 0% 0% ;margin-top:10%;visibility:visible"{% endif %}>
+			  <div class="button_submission">Download</div>
+	    </button>
+    </a>
+  </div>
+	<div id="result" style="width:35%; float:right">
+		<img id="result_image" src="static/output_images/{{dict_transfer.token}}.jpg" style="width:100%;height:auto">
+	</div>
+</div>
+
+<script src="{{url_for('static', filename='scripts/canvas_module.js')}}"></script>
+{% endblock %}

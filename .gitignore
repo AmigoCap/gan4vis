@@ -9,3 +9,4 @@ server/gan4vis_heroku_virtual_env
 *.db
 *.pyc
 __pycache__
+*.gif

@@ -1,4 +1,5 @@
 var canvasDiv = document.getElementById('canvasDivId');
+var ajax_binary_image;
 
 var clickX = new Array();
 var clickY = new Array();
@@ -69,24 +70,25 @@ function redraw()
 	}
 }
 
-function save_sketch()
-{
-
-	form_canvas = document.getElementById("hiddenCanvasContentId");
-	form_canvas.value = canvas.toDataURL("image/png");
-
-	submit_button.classList.remove('btn-info');
-	submit_button.classList.add('btn-warning');
-	submit_button.innerHTML = " Loading..."
-
-	loader = document.createElement('span');
-	loader.classList.add('glyphicon');
-	loader.classList.add('glyphicon-refresh');
-	loader.classList.add('glyphicon-refresh-animate');
-
-	submit_button.insertBefore(loader, submit_button.childNodes[0])
-
-}
-
-submit_button = document.getElementById("saveSketchButtonId");
-submit_button.onclick = save_sketch;
+$("#create_transition_button").on("touchstart click",function() {
+  ajax_binary_image = canvas.toDataURL("image/png")
+  $.ajax({
+    url: "/treatment_transitions",
+    type: "POST",
+    data: JSON.stringify({
+      "image": ajax_binary_image, // Send the binary of the drawn sketch
+    }),
+    contentType: "application/json; charset=utf-8",
+    beforeSend: function() {
+      document.getElementById("download_button").style.visibility = "hidden" //hidden the download option
+      $('#spinning_wheel').show();    /*showing  a div with spinning image */
+    },
+    success: function(response) {
+      $('#spinning_wheel').hide();
+      document.getElementById("download_button").style.visibility = "visible" //show the download option
+      $("#result_image").attr("src", "static/output_images/" + response + ".gif") //Update the result image
+      document.getElementById('download_link').setAttribute("href","static/output_images/" + response + ".jpg") //Update the download target
+      history.pushState(window.location.href, "index", "?token=" + response)
+    }
+  })
+});
