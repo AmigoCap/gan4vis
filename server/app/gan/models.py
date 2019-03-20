@@ -143,4 +143,4 @@ class AutoEncoder64(nn.Module):
         x = F.relu(x)
         x = self.dconv1(x)
         x = F.relu(x)
-return x
+        return x
