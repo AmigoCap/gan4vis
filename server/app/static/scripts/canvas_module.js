@@ -82,6 +82,8 @@ $("#create_transition_button").on("touchstart click",function() {
     beforeSend: function() {
       document.getElementById("download_button").style.visibility = "hidden" //hidden the download option
       document.getElementById("spinning_wheel").style.visibility = "visible";
+      clickX = new Array();
+      clickY = new Array();
     },
     success: function(response) {
       document.getElementById("spinning_wheel").style.visibility = "hidden";
