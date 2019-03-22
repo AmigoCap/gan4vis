@@ -66,15 +66,42 @@ Nous allons à présent détailler le processus à l'oeuvre lors de l'utilisatio
 **Transfert et transition**
 
 <p align="center">
-<img src="server/app/static/utilitaries_images/structure_process.png" width="100%">
+<img src="server/app/static/utilitaries_images/structure_process.png" width="75%">
 </p>
 
-1. L'utilisateur se connecte à l'interface d'accueil. 
-2. L'interface est générée par aggrégation d'information venant du serveur et un ensemble de fichiers (html, js, css et images). L'utilisateur peut alors paramètrer le transfert de style en modifiant la visualisation et en choisissant un modèle.
-3. L'utilisateur clique sur le bouton d'application du transfert de style. Une requête AJAX part alors du serveur contenant les paramètres de la visualisation ainsi qu'une chaîne de caractères correspondant à l'image d'entrée.
-4. Une fonction "treatment" présente dans le fichier "routes.py" est alors en charge du transfert de style. La fonction appelle une fonction présente dans "neural_style.py" et stocke les caractéristiques du transfert dans la base de données grâce au fichier "models.py" 
-5. Une fois le transfert effectué, la fonction "treatment" renvoie un token qui correspond à l'identifiant de l'opération de transfert de style en cours. 
-6. L'arrivée du token chez le client permet une mise à jour de l'URL par jQuery et une mise à jour de l'image de sortie par requête GET de l'image correspondant à l'identifiant au serveur.
+<table>
+  <tr>
+    <td></td>
+    <td>Transfert</td>
+    <td>Transition</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td colspan="2">L'utilisateur se connecte à l'interface de transfert ou de transition.</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td colspan="2">L'interface est générée par aggrégation de l'information venant du serveur et un ensemble de fichiers (html, js, css et images). L'utilisateur peut alors paramètrer le transfert de style ou la transition.</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td colspan="2">L'utilisateur clique sur le bouton d'application du transfert de style ou de la transition. Une requête AJAX part alors du serveur contenant les paramètres de l'opération ainsi qu'une chaîne de caractères correspondant à l'image d'entrée.</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Transfert. Une fonction "treatment" présente dans le fichier "routes.py" est alors en charge du transfert de style, un token est défini correspondant à l'opération. La fonction appelle une fonction présente dans "neural_style.py" qui sauvegarde l'image de sortie en la nommant à l'aide du token. 
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Les paramètres d'entée et de sortie du transfert sont sauvegardés dans la base de données grâce au fichier "models.py" en utilisant le token défini précédemment.</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td colspan="2">Le token de l'opération est envoyé sur le client. Son arrivée sur le client permet une mise à jour de l'URL par jQuery et une mise à jour de l'image de sortie par requête GET de l'image correspondant à l'identifiant au serveur.</td>
+  </tr>
+</table>
 
 **Dashboard**
 
@@ -115,20 +142,20 @@ Nous détaillons ci-dessous les aspects important de la gestion et de la mise en
 
 ### Accès au serveur
 
-L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons succintement les étapes nécessaires à la création d'un nouvel utilisateur, nous fournissons les ressources plus bas : 
+L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons ci-dessous succintement les étapes nécessaires à la création d'un nouvel utilisateur. 
 
-**Créer un nouvel utilisateur :**
+**1. Créer un nouvel utilisateur**
 
 ```console
 $ adduser utilisateur
 ```
 
-**Donner l'accès root à l'utilisateur :** 
+**2. Donner l'accès root à l'utilisateur** 
 ```console
 $ usermod -aG sudo utilisateur
 ```
 
-**Configurer le SSH du nouvel utilisateur pour l'accès root :** 
+**3. Configurer le SSH du nouvel utilisateur pour l'accès root** 
 
 Se connecter en root au serveur depuis une console : 
 
@@ -139,17 +166,17 @@ $ ssh root@ip-server
 Ouvrir le fichier "~/.ssh/authorized_keys" du root :
 
 ```console
-$ nano ~/.ssh/authorized_keys`
+$ nano ~/.ssh/authorized_keys
 ```
 
 Puis y ajouter la clé ssh de l'utilisateur. Cette suite d'étape terminée, vérifier que l'utilisateur arrive bien à se connecter en root.
 
-**Configurer le SSH du nouvel utilisateur pour accès utilisateur :** 
+**4. Configurer le SSH du nouvel utilisateur pour accès utilisateur** 
 
 La configuration se fait automatiquement sur demande de l'utilisateur. Il lui suffit d'ouvrir une session dans sa console et de rentrer la ligne suivante. Il aura alors à rentrer le mot de passe root.
 
-```
-ssh-copy-id utilisateur@ip-server
+```console
+$ ssh-copy-id utilisateur@ip-server
 ```
 
 Les ressources nécessaires à la création d'un utilisateur et à l'administration de ses droits peuvent être trouvées ci-dessous :
@@ -162,9 +189,38 @@ Les ressources nécessaires à la création d'un utilisateur et à l'administrat
 
 ### Flask
 
-### Gestion
-Logs et mise à jour utilisant Git
+### Mise à jour
+
+Le serveur utilise la version de l'application présente sur GitHub. Le serveur tourne à partir de la branche master. Voici les étapes nécessaires à la mise à jour du serveur à la suite d'une modification sur GitHub.
+
+**1. Se connecter en SSH en tant qu'utilisateur au serveur** 
+
+**2. Se rendre dans le dossier "home/guillaume/gan4vis"**
+
+**3. Faire un pull des modifications**
+
+```console
+$ git pull origin master
+```
+
+**4. Relancer Gunicorn** 
+
+```console
+$ sudo systemctl restart server
+$ sudo systemctl enable server
+$ sudo systemctl status server 
+```
+
+**5. Relancer NGINX**
+
+```console
+$ sudo systemctl restart nginx 
+```
+
+Le serveur est alors à jour et peut être accédé normalement par URL.
 
 **DNS et Réseau**
+
+
 
 
