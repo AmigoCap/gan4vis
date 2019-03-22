@@ -37,6 +37,10 @@ Les images stockées sur le serveur correspondent aux images générées lors de
 
 Nous avons opté pour une base SQLite pour enregistrée les configurations des transferts de style réalisés. Cette base correspond au fichier gan4vis/server/app.db. Elle est constituée d'une unique table appelée transfer. Nous avons fait le choix d'utiliser [SQLAlchemy](https://www.sqlalchemy.org/) pour travailler avec la base dans notre application. La structure de la base est reliée au fichier "models.py". Celui-ci defini une class appelée "Transfer" qui correspond à la table de la base. Les colonnes de cette table correspondent aux aspects des transferts de style dont nous souhaitons garder la trace. Ci-dessous un exemple d'entrée de la table.
 
+<p align="center">
+<img src="server/app/static/utilitaries_images/database.png" width="100%">
+</p>
+
 * **token** : identifiant unique généré automatiquement correspondant à un transfert de style. Cet identifiant permet de nommer l'image et est intégré à l'URL afin de pouvoir partager et recharger un transfert de style. Ce point sera détaillé plus bas.
 * **date** : date du transfert de style.
 * **model** : modèle utilisé
@@ -59,7 +63,11 @@ Des modifications importantes pourront nécessiter une adaptation des données p
 
 Nous allons à présent détailler le processus à l'oeuvre lors de l'utilisation de chacune des pages web. Nous détaillerons plus particulièrement les opérations liées au transfert de style et à la transition.
 
-**Transfert de style**
+**Transfert et transition**
+
+<p align="center">
+<img src="server/app/static/utilitaries_images/structure_process.png" width="100%">
+</p>
 
 1. L'utilisateur se connecte à l'interface d'accueil. 
 2. L'interface est générée par aggrégation d'information venant du serveur et un ensemble de fichiers (html, js, css et images). L'utilisateur peut alors paramètrer le transfert de style en modifiant la visualisation et en choisissant un modèle.
@@ -72,30 +80,89 @@ Nous allons à présent détailler le processus à l'oeuvre lors de l'utilisatio
 
 Un système de dashboard a été mis en place afin de rendre compte de l'utilisation de la partie transfer de style ouverte au public. Une simple route appelée "dashboard" a été créée. Elle parcourt la base de données afin d'envoyer au client les données d'utilisation. Le client les exploite ensuite à l'aide de D3.js (version 5) afin de créer les graphiques.
 
-**Transition**
-
 **Partage d'URL**
 
-Nous avons souhaité pourvoir partagé une application de transfert d
+Nous avons souhaité pourvoir partager notre application de transfert de style par URL. Le but étant qu'après avoir généré un transfert, je puisse le partager à quelqu'un qui rechargerait la page à son tour avec toutes les données d'entrée et sortie de l'image initiale. La route "index" est le coeur du processus qui permet cela
+
+```python
+@app.route('/index', methods=['GET', 'POST'])
+def index():
+    token = request.args.get('token')
+    app.logger.info("index token={}".format(token))
+    dict_transfer = {"token":"placeholder","model":"mosaic.pth","distribution":"random","datapoints":"","grid":"vertical","orientation":"up","ratio":2} # Start ratio at 2 to be able to activate both zooms on page load
+    if token:
+        transfer = Transfer.query.filter_by(token=token).first()
+        dict_transfer = {"token":transfer.token,"model":transfer.model,"distribution":transfer.distribution,"datapoints":transfer.datapoints,"grid":transfer.grid,"orientation":transfer.orientation,"ratio":transfer.ratio}
+    return render_template('index.html', title='GAN4VIS', dict_transfer=dict_transfer)
+```
+
+Cette route est la fonction déclenchée sur le serveur à chaque fois qu'un utilisateur se rend sur l'URL https://gan4vis.net/index. Bien qu'aucun argument ne soit présent dans la route, la fonction reçoit en réalité systématiquement une information du client. En effet, la ligne : `token = request.args.get('token')` va rechercher une information de l'URL du client du type "y a-t-il un argument "token dans l'URL ?". Ainsi :
+
+* https://gan4vis.net/index : token = None
+* https://gan4vis.net/index?token=558af5eb-db76-4f7f-b500-536d123f3b30 : token = 558af5eb-db76-4f7f-b500-536d123f3b30
+
+Par la suite, un dictionaire est initialisé dans la route en fonction de la présence d'information sur le token. Si le token est spécifié, une configuration lui correspondant sera cherchée dans la base de donnée. Sinon une configuration par défaut sera utilisée. Enfin, les codes html et javascript utilisés sur le client on été adaptés afin de fonctionner dans les deux cas. 
 
 ## Serveur
 
-### Vue d'ensemble
+À fin mars 2019 le serveur à la configuration suivante : 
 
-**Spécifications**
+* 8 GB Memory 
+* 160 GB Disk
+* Ubuntu 18.04.1 x64
 
-**Accès**
-SSH (utilisateurs / root) éviter la console Digital Ocean ! Configuration d'accès avec ressource
+Nous détaillons ci-dessous les aspects important de la gestion et de la mise en place du serveur
 
-### Configuration
+### Accès au serveur
 
-**NGINX**
+L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons succintement les étapes nécessaires à la création d'un nouvel utilisateur, nous fournissons les ressources plus bas : 
 
-**Gunicorn**
+**Créer un nouvel utilisateur :**
 
-**Flask**
+```console
+$ adduser utilisateur
+```
 
-**Gestion**
+**Donner l'accès root à l'utilisateur :** 
+```console
+$ usermod -aG sudo utilisateur
+```
+
+**Configurer le SSH du nouvel utilisateur pour l'accès root :** 
+
+Se connecter en root au serveur depuis une console : 
+
+```console
+$ ssh root@ip-server
+```
+
+Ouvrir le fichier "~/.ssh/authorized_keys" du root :
+
+```console
+$ nano ~/.ssh/authorized_keys`
+```
+
+Puis y ajouter la clé ssh de l'utilisateur. Cette suite d'étape terminée, vérifier que l'utilisateur arrive bien à se connecter en root.
+
+**Configurer le SSH du nouvel utilisateur pour accès utilisateur :** 
+
+La configuration se fait automatiquement sur demande de l'utilisateur. Il lui suffit d'ouvrir une session dans sa console et de rentrer la ligne suivante. Il aura alors à rentrer le mot de passe root.
+
+```
+ssh-copy-id utilisateur@ip-server
+```
+
+Les ressources nécessaires à la création d'un utilisateur et à l'administration de ses droits peuvent être trouvées ci-dessous :
+* [Server Setup](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04)
+* [SSH Connection Setup](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804)
+
+### NGINX
+
+### Gunicorn
+
+### Flask
+
+### Gestion
 Logs et mise à jour utilisant Git
 
 **DNS et Réseau**
