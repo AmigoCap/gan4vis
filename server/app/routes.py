@@ -187,5 +187,5 @@ def treatment_transitions():
 def transition():
     token = request.args.get('token')
     app.logger.info("index token={}".format(token))
-    dict_transfer = {"token":"placeholder"}
+    dict_transfer = {"token":"placeholder_sq"}
     return render_template('transitions.html', title='GAN4VIS - Transitions', dict_transfer=dict_transfer)

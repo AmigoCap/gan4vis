@@ -81,10 +81,10 @@ $("#create_transition_button").on("touchstart click",function() {
     contentType: "application/json; charset=utf-8",
     beforeSend: function() {
       document.getElementById("download_button").style.visibility = "hidden" //hidden the download option
-      $('#spinning_wheel').show();    /*showing  a div with spinning image */
+      document.getElementById("spinning_wheel").style.visibility = "visible";
     },
     success: function(response) {
-      $('#spinning_wheel').hide();
+      document.getElementById("spinning_wheel").style.visibility = "hidden";
       document.getElementById("download_button").style.visibility = "visible" //show the download option
       $("#result_image").attr("src", "static/output_images/" + response + ".gif") //Update the result image
       document.getElementById('download_link').setAttribute("href","static/output_images/" + response + ".jpg") //Update the download target

@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block app_scripts %}
+{{ super() }}
+{% endblock %}
+
 {% block app_content %}
 <div id="title" class="container" style="width:100%; margin-bottom:3%">
 	<div style="float: left; text-align:center; width: 100%">
@@ -8,24 +12,106 @@
 	</div>
 </div>
 
-<div id="charts" class="container" style="width:100%; display: flex;justify-content: space-between">
-  <p>Sketching area:</p>
-  <div id="canvasDivId" style="width:35%; float: left"></div>
-	<div id="submission" style="width:10%">
-		<button id="create_transition_button" class="btn btn-danger btn-lg" type="submit" style="width:100%;height:15%;padding: 0% 0% ;margin-top:100%">
-			<div class="button_submission">Create Transition</div>
+<div id="titles" class="container" style="width:100%; display: flex;justify-content: space-between; margin-bottom:0.5%; padding-left:0; padding-right:0;">
+		<div id="title_preview" style="width:35%; float: left; font-size:1.2vw; text-align:center;margin-left:7.5%;margin-right:7.5%;font-weight: bold">Design your transition curve</div>
+		<div id="title_result" style="width:35%; float:right; font-size:1.2vw; text-align:center;margin-left:7.5%;margin-right:7.5%;font-weight: bold">Generated animation</div>
+</div>
+
+<div id="end_image_holder">
+	<img src="static/utilitaries_images/transition_end.jpg" style="width: 5%; height: 5%; margin-left: 38%" />
+</div>
+
+<div id="charts" class="container" style="width:100%; height:auto; display: flex;justify-content: space-between; padding-left:0; padding-right:0;">
+	<div id="choice_background" style="width:7.5%; float: left"></div>
+	<div id="canvasDivId" style="width:256px; height: 256px; float: left; border: 1px solid #888888"></div>
+	<div id="submission" style="width:10%; height:auto; margin-left:2.5%; margin-right:2.5%;display:flex;flex-direction:column;justify-content:center">
+		<div style="width:40%;margin-left:30%; margin-right:30%"><i class="fa fa-long-arrow-right" style="font-size:3.5vw;color:#d9534f"></i></div>
+		<button id="create_transition_button" class="btn btn-danger btn-lg" type="submit" style="width:100%;padding: 10% 0% ;float:left;margin-top:10%;margin-bottom:10%">
+			<div class="button_submission">Apply Style</div>
 		</button>
-		<img id="spinning_wheel" src="static/utilitaries_images/spinning.gif" style="width:40%;margin-top:10%; margin-left:30%; margin-right:30%;" hidden="hidden">
+		<img id="spinning_wheel" src="static/utilitaries_images/spinning.gif" style="width:40%; margin-left:30%; margin-right:30%;visibility:hidden">
+	</div>
+	<div id="result" style="width:256px; height: 256px; float:right">
+		<img id="result_image" src="static/output_images/{{dict_transfer.token}}.jpg" style="width:256px; height: 256px;height:auto">
+	</div>
+	<div id="output_options" style="width:5%; float: left; margin-left:2.5%;display:flex;flex-direction:column;justify-content:space-evenly">
+		<button id="" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;padding: 0% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:hidden"{% endif %}>
+			<div class="button_submission"><i class="fa fa-download" aria-hidden="true"></i></div>
+		</button>
 		<a id="download_link" href="static/output_images/{{dict_transfer.token}}.jpg" download>
-			<button id="download_button" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;height:15%;padding: 0% 0%;margin-top:10%;visibility:hidden"{% else %}style="width:100%;height:15%;padding: 0% 0% ;margin-top:10%;visibility:visible"{% endif %}>
-			  <div class="button_submission">Download</div>
-	    </button>
-    </a>
-  </div>
-	<div id="result" style="width:35%; float:right">
-		<img id="result_image" src="static/output_images/{{dict_transfer.token}}.jpg" style="width:100%;height:auto">
+			<button id="download_button" class="btn btn-primary btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;padding: 20% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:visible;"{% endif %}>
+				<div class="button_submission"><i class="fa fa-download" aria-hidden="true"></i></div>
+			</button>
+		</a>
+		<button id="" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;padding: 0% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:hidden"{% endif %}>
+			<div class="button_submission"><i class="fa fa-download" aria-hidden="true"></i></div>
+		</button>
 	</div>
 </div>
 
+<div id="begin_image_holder">
+	<img src="static/utilitaries_images/transition_begin.jpg" style="width: 5%; height: 5%; margin-left: 11%" />
+</div>
+
+<div id="background" class="container" style="width:100%; margin-top:2%;margin-bottom:2%;">
+	<div id="team" style="float: left; width: 100%">
+		<table style="width:100%; table-layout: fixed">
+			<tr>
+				<td style="width:14%">
+					<div class="collaborators_title">Team</div>
+				</td>
+				<td style="width:5%">
+					<a class="fa fa-linkedin" target="_blank" href="https://www.linkedin.com/in/charles-dupuy-2a90b513b/" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
+				</td>
+				<td style="width:16.5%">
+					<div class="collaborators_name">Charles Dupuy</div>
+				</td>
+				<td style="width:5%">
+					<a class="fa fa-github" target="_blank" href="https://github.com/guillaume-lesaine" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
+				</td>
+				<td style="width:16.5%">
+					<div class="collaborators_name">Guillaume Lesaine</div>
+				</td>
+				<td style="width:5%">
+					<a class="fa fa-github" target="_blank" href="https://github.com/clevecque" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
+				</td>
+				<td style="width:16.5%">
+					<div class="collaborators_name">Clémence Lévêcque</div>
+				</td>
+				<td style="width:5%">
+					<a class="fa fa-linkedin" target="_blank" href="https://www.linkedin.com/in/william-pierre-93458a11b/" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
+				</td>
+				<td style="width:16.5%">
+					<div class="collaborators_name">William Pierré</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width:14%">
+					<div class="collaborators_title">Supervisors</div>
+				</td>
+				<td style="width:5%">
+					<a class="fa fa-github" target="_blank" href="https://github.com/Theo-Jaunet" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
+				</td>
+				<td style="width:16.5%">
+					<div class="collaborators_name">Théo Jaunet</div>
+				</td>
+				<td style="width:5%">
+					<a class="fa fa-desktop" target="_blank" href="http://romain.vuillemot.net/" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
+				</td>
+				<td style="width:16.5%">
+					<div class="collaborators_name">Romain Vuillemot</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="institutions" style="float: left; margin-bottom:2%; margin-top:2%; width: 100%">
+		<a href="https://liris.cnrs.fr/en" target="_blank"><img src="static/utilitaries_images/liris_logo.jpg" style="width:18%;margin-left:7%;margin-right:7%"></a>
+		<a href="https://www.ec-lyon.fr/en" target="_blank"><img src="static/utilitaries_images/centrale_lyon.jpg" style="width:30%;margin-left:1.5%;margin-right:1.5%"></a>
+		<a href="https://www.universite-lyon.fr/version-anglaise/" target="_blank"><img src="static/utilitaries_images/universite_logo.jpg" style="width:16%;margin-left:8%;margin-right:8%"></a>
+	</div>
+</div>
+
+
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/styles.css')}}">
 <script src="{{url_for('static', filename='scripts/canvas_module.js')}}"></script>
 {% endblock %}
