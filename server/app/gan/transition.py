@@ -86,8 +86,7 @@ def interpol(dict_arg):
     #generator = GeneratorUNet()
     generator = AutoEncoder()
 
-    path_to_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-    path_to_model = os.path.join(path_to_root, 'saved_models', opt.dataset_name, 'generator_%d.pth' % opt.epoch)
+    path_to_model = os.path.join(os.path.dirname(__file__), 'saved_models', opt.dataset_name, 'generator_%d.pth' % opt.epoch)
     
     generator.load_state_dict(torch.load(path_to_model, map_location='cpu'))
 
