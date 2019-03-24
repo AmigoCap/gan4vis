@@ -185,7 +185,116 @@ Les ressources nécessaires à la création d'un utilisateur et à l'administrat
 
 ### NGINX
 
-### Gunicorn
+[NGINX](https://fr.wikipedia.org/wiki/NGINX) est la première couche sur laquelle est assise l'application. NGINX permet entre autres la gestion des requêtes. Nous détaillons ci-dessous les étapes nécessaire au paramétrage de NGINX sur une machine Ubuntu 18.04.1. En pré-requis de cette étape, nous considérons que :
+*Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
+
+**1. Installation**
+
+Installer tout dabord la dernière version de NGINX.
+
+```console
+$ sudo apt update
+$ sudo apt install nginx
+```
+
+**2. Configuration du pare-feu**
+
+Autoriser NGINX à gérer les requêtes :
+
+```console
+$ sudo ufw allow 'Nginx HTTP'
+```
+
+**3. Vérification**
+
+Vérifier que les requêtes avec NGINX sont bien autorisées :
+
+```console
+$ sudo ufw status
+```
+
+Vérifier que tout fonctionne bien :
+
+```console
+$ systemctl status nginx
+```
+```console
+Output
+nginx.service - A high performance web server and a reverse proxy server
+   Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2018-04-20 16:08:19 UTC; 3 days ago
+     Docs: man:nginx(8)
+ Main PID: 2369 (nginx)
+    Tasks: 2 (limit: 1153)
+   CGroup: /system.slice/nginx.service
+           ├─2369 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+           └─2380 nginx: worker process
+```
+
+Les ressources utilisées pour la configuration du pare-feu sont disponibles ici :
+* [How To Install Nginx on Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04)
+
+### Python, Gunicorn & Flask
+
+Cette étape permet la configuration des seconde et troisième couche de l'application. La seconde couche consiste en [Gunicorn](https://fr.wikipedia.org/wiki/Gunicorn) qui est un serveur web HTTP WSGI. La troisième couche correspond au serveur Flask. Nous présentons ci-dessous les étapes nécessaires à la configuration de ces deux couches. En pré-requis de cette étape, nous considérons que :
+*Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
+*NGINX a été configuré et fonctionne comme présenté précédemment.
+
+**1. Installation Python et dépendances**
+
+Installons tout d'abord Python et l'ensemble des ressources associées
+
+```console
+$ sudo apt update
+$ sudo apt install python3-pip python3-dev build-essential libssl-dev libffi-dev python3-setuptools
+```
+
+**2. Création du dossier du serveur**
+
+L'application utilise un certain nombre de modules Python. Nous allons donc créer un environnement virtuel afin de délimiter clairement le périmètre du serveur. Installons tout d'abord la ressource permettant de créer un environnement virtuel :
+
+```console
+sudo apt install python3-venv
+```
+
+Avant d'aller plus loin, faisons un point sur la structure actuelle des dossiers de la machine. 
+
+```console
+├── home
+   └── utilisateur
+```
+
+Nous voulons aller vers une structure qui ressemble à ça :
+
+```console
+├── home
+   └── utilisateur
+      └── gan4vis
+```
+
+Nous allons donc à présent devoir créer le dossier de l'application. Nous allons simplement effectuer un git clone du directory GitHub. Avant cela installer Git :
+
+```console
+sudo apt-get install -y git
+```
+
+Assurez-vous ensuite d'être dans le dossier `/home/utilisateur`? Créer maintenant un clone du directory GitHub :
+
+```console
+git clone https://github.com/AmigoCap/gan4vis.git
+```
+
+
+
+ici le dossier correspondant à l'application et déplaçons nous-y, 
+
+**3. Créer un environnement virtuel**
+
+
+```console
+mkdir gan4vis
+cd gan4vis
+```
 
 ### Flask
 
