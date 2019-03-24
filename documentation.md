@@ -217,7 +217,7 @@ Vérifier que tout fonctionne bien :
 
 ```console
 $ systemctl status nginx
-```
+``
 ```console
 Output
 nginx.service - A high performance web server and a reverse proxy server
@@ -251,23 +251,17 @@ $ sudo apt install python3-pip python3-dev build-essential libssl-dev libffi-dev
 
 **2. Création du dossier du serveur**
 
-L'application utilise un certain nombre de modules Python. Nous allons donc créer un environnement virtuel afin de délimiter clairement le périmètre du serveur. Installons tout d'abord la ressource permettant de créer un environnement virtuel :
-
-```console
-sudo apt install python3-venv
-```
-
 Avant d'aller plus loin, faisons un point sur la structure actuelle des dossiers de la machine. 
 
 ```console
-├── home
+└── home
    └── utilisateur
 ```
 
 Nous voulons aller vers une structure qui ressemble à ça :
 
 ```console
-├── home
+└── home
    └── utilisateur
       └── gan4vis
 ```
@@ -275,26 +269,158 @@ Nous voulons aller vers une structure qui ressemble à ça :
 Nous allons donc à présent devoir créer le dossier de l'application. Nous allons simplement effectuer un git clone du directory GitHub. Avant cela installer Git :
 
 ```console
-sudo apt-get install -y git
+$ sudo apt-get install -y git
 ```
 
 Assurez-vous ensuite d'être dans le dossier `/home/utilisateur`? Créer maintenant un clone du directory GitHub :
 
 ```console
-git clone https://github.com/AmigoCap/gan4vis.git
+$ git clone https://github.com/AmigoCap/gan4vis.git
 ```
-
-
-
-ici le dossier correspondant à l'application et déplaçons nous-y, 
-
-**3. Créer un environnement virtuel**
-
+Notre serveur ne se trouve pas directement à la racine du directory GitHub. Déplaçons-nous donc maintenant dans le dossier de l'application :
 
 ```console
-mkdir gan4vis
-cd gan4vis
+$ cd gan4vis/server
 ```
+
+**3. Initialiser un environnement virtuel**
+
+L'application utilise un certain nombre de modules Python. Nous allons donc créer un environnement virtuel afin de délimiter clairement le périmètre du serveur. Installons tout d'abord la ressource permettant de créer un environnement virtuel :
+
+```console
+$ sudo apt install python3-venv
+```
+
+Créer l'environnement virtuel :
+
+```console
+$ python3.6 -m venv gan4vis_env
+```
+
+Une fois l'environnement créé, nous allons l'activer en le définissant comme source. Cela permettra d'installer les modules nécessaires. À l'avenir, l'application utilisera toujours cet environnement virtuel.
+
+```console
+$ source gan4vis_env/bin/activate
+```
+
+Commencer par installer wheel
+
+```console
+$ pip install wheel
+```
+
+Installer ensuite l'ensemble des modules utilisés par l'application. Pour cela utiliser le fichier `gan4vis/server/requirements.txt` : 
+
+```console
+$ pip install -r requirements.txt
+```
+
+**4. Configurer Gunicorn**
+
+Nous allons tout d'abord vérifier que toutes les étapes précédentes se sont bien passées. Autoriser tout dabord le pare-feu : 
+
+```console
+$ sudo ufw allow 5000
+```
+
+Lancer ensuite une première version du serveur. S'assurer d'être dans le dossier `home/utilisateur/gan4vis/server` :
+
+```console
+$ gunicorn --bind 0.0.0.0:5000 wsgi:app
+```
+
+L'URL doit permettre d'accéder à l'application http://ip-serveur:5000. Si tout fonctionne correctement, vous pouvez sortir de l'environnement virtuel :
+
+```console
+$ deactivate
+```
+
+Nous allons créer un premier fichier `server.service`. Pour cela, entrer la commande suivante :
+
+```console
+$ sudo nano /etc/systemd/system/server.service
+```
+
+Remplisser ensuite le fichier avec le contenu suivant en l'adaptant au nom de l'utilisateur :
+
+```console
+[Unit]
+Description=Gunicorn instance to serve server
+After=network.target
+
+[Service]
+User=utilisateur
+Group=www-data
+WorkingDirectory=/home/utilisateur/gan4vis/server
+Environment="PATH=/home/utilisateur/gan4vis/server/gan4vis_env/bin"
+ExecStart=/home/utilisateur/gan4vis/server/gan4vis_env/bin/gunicorn --workers 3 --bind unix:server.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```console
+$ sudo systemctl start server
+$ sudo systemctl enable server
+$ sudo systemctl status server
+```
+
+La sortie doit alors montrer que le serveur est actif :
+
+```console
+myproject.service - Gunicorn instance to serve myproject
+   Loaded: loaded (/etc/systemd/system/myproject.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2018-07-13 14:28:39 UTC; 46s ago
+ Main PID: 28232 (gunicorn)
+    Tasks: 4 (limit: 1153)
+   CGroup: /system.slice/myproject.service
+           ├─28232 /home/sammy/myproject/myprojectenv/bin/python3.6 /home/sammy/myproject/myprojectenv/bin/gunicorn --workers 3 --bind unix:myproject.sock -m 007
+           ├─28250 /home/sammy/myproject/myprojectenv/bin/python3.6 /home/sammy/myproject/myprojectenv/bin/gunicorn --workers 3 --bind unix:myproject.sock -m 007
+           ├─28251 /home/sammy/myproject/myprojectenv/bin/python3.6 /home/sammy/myproject/myprojectenv/bin/gunicorn --workers 3 --bind unix:myproject.sock -m 007
+           └─28252 /home/sammy/myproject/myprojectenv/bin/python3.6 /home/sammy/myproject/myprojectenv/bin/gunicorn --workers 3 --bind unix:myproject.sock -m 007
+```
+
+**5. Fin de configuration NGINX**
+
+Nous allons à présent finaliser la configuration de NGINX. Cela passe par la création d'un dernier fichier :
+
+```console
+$ sudo nano /etc/nginx/sites-available/gan4vis/server
+```
+
+```console
+server {
+    listen 80;
+    server_name your_domain www.your_domain;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/utilisateur/gan4vis/server/server.sock;
+    }
+}
+```
+
+Entrer les commandes suivantes :
+
+```console
+$ sudo ln -s /etc/nginx/sites-available/gan4vis/server /etc/nginx/sites-enabled
+$ sudo nginx -t
+$ sudo systemctl restart nginx
+```
+
+Désactiver ensuite la permission du pare-feu :
+
+```console
+$ sudo ufw delete allow 5000
+```
+
+Permettre 'Nginx Full' pour le pare-feu : 
+
+```console
+$ sudo ufw allow 'Nginx Full'
+```
+
+Si votre DNS est configurer, vous devriez pouvoir accéder au site avec à http://gan4vis.net
 
 ### Flask
 
