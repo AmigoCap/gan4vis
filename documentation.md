@@ -142,6 +142,10 @@ Nous détaillons ci-dessous les aspects important de la gestion et de la mise en
 
 ### Accès au serveur
 
+Les ressources nécessaires à la création d'un utilisateur et à l'administration de ses droits peuvent être trouvées ci-dessous :
+* [Initial Server Setup with Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04)
+* [How to Set Up SSH Keys on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804)
+
 L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons ci-dessous succintement les étapes nécessaires à la création d'un nouvel utilisateur. 
 
 **1. Créer un nouvel utilisateur**
@@ -179,11 +183,10 @@ La configuration se fait automatiquement sur demande de l'utilisateur. Il lui su
 $ ssh-copy-id utilisateur@ip-server
 ```
 
-Les ressources nécessaires à la création d'un utilisateur et à l'administration de ses droits peuvent être trouvées ci-dessous :
-* [Server Setup](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04)
-* [SSH Connection Setup](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804)
-
 ### NGINX
+
+Les ressources utilisées sont disponibles ici :
+* [How To Install Nginx on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04)
 
 [NGINX](https://fr.wikipedia.org/wiki/NGINX) est la première couche sur laquelle est assise l'application. NGINX permet entre autres la gestion des requêtes. Nous détaillons ci-dessous les étapes nécessaire au paramétrage de NGINX sur une machine Ubuntu 18.04.1. En pré-requis de cette étape, nous considérons que :
 *Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
@@ -217,7 +220,8 @@ Vérifier que tout fonctionne bien :
 
 ```console
 $ systemctl status nginx
-``
+```
+
 ```console
 Output
 nginx.service - A high performance web server and a reverse proxy server
@@ -231,10 +235,10 @@ nginx.service - A high performance web server and a reverse proxy server
            └─2380 nginx: worker process
 ```
 
-Les ressources utilisées pour la configuration du pare-feu sont disponibles ici :
-* [How To Install Nginx on Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04)
-
 ### Python, Gunicorn & Flask
+
+L'ensemble des ressources utilisées se trouvent au lien suivant : 
+* [How To Serve Flask Applications with Gunicorn and Nginx on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04)
 
 Cette étape permet la configuration des seconde et troisième couche de l'application. La seconde couche consiste en [Gunicorn](https://fr.wikipedia.org/wiki/Gunicorn) qui est un serveur web HTTP WSGI. La troisième couche correspond au serveur Flask. Nous présentons ci-dessous les étapes nécessaires à la configuration de ces deux couches. En pré-requis de cette étape, nous considérons que :
 *Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
@@ -315,7 +319,7 @@ Installer ensuite l'ensemble des modules utilisés par l'application. Pour cela 
 $ pip install -r requirements.txt
 ```
 
-**4. Configurer Gunicorn**
+**4. Configurer Gunicorn et lancer le serveur**
 
 Nous allons tout d'abord vérifier que toutes les étapes précédentes se sont bien passées. Autoriser tout dabord le pare-feu : 
 
@@ -380,8 +384,6 @@ myproject.service - Gunicorn instance to serve myproject
            └─28252 /home/sammy/myproject/myprojectenv/bin/python3.6 /home/sammy/myproject/myprojectenv/bin/gunicorn --workers 3 --bind unix:myproject.sock -m 007
 ```
 
-**5. Fin de configuration NGINX**
-
 Nous allons à présent finaliser la configuration de NGINX. Cela passe par la création d'un dernier fichier :
 
 ```console
@@ -420,9 +422,7 @@ Permettre 'Nginx Full' pour le pare-feu :
 $ sudo ufw allow 'Nginx Full'
 ```
 
-Si votre DNS est configurer, vous devriez pouvoir accéder au site avec à http://gan4vis.net
-
-### Flask
+Si votre DNS est configuré, vous devriez pouvoir accéder au site avec à http://gan4vis.net
 
 ### Mise à jour
 
