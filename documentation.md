@@ -146,31 +146,28 @@ Les ressources nécessaires à la création d'un utilisateur et à l'administrat
 * [Initial Server Setup with Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04)
 * [How to Set Up SSH Keys on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804)
 
-L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons ci-dessous succintement les étapes nécessaires à la création d'un nouvel utilisateur. 
+L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons ci-dessous succintement les étapes nécessaires à la création d'un nouvel utilisateur. Il est conseillé de faire les étapes suivantes en root. 
 
 **1. Créer un nouvel utilisateur**
 
 ```console
-$ adduser utilisateur
+# adduser utilisateur
 ```
 
+Entrez alors les informations requises. 
+
 **2. Donner l'accès root à l'utilisateur** 
+
 ```console
-$ usermod -aG sudo utilisateur
+# usermod -aG sudo utilisateur
 ```
 
 **3. Configurer le SSH du nouvel utilisateur pour l'accès root** 
 
-Se connecter en root au serveur depuis une console : 
-
-```console
-$ ssh root@ip-server
-```
-
 Ouvrir le fichier "~/.ssh/authorized_keys" du root :
 
 ```console
-$ nano ~/.ssh/authorized_keys
+# nano ~/.ssh/authorized_keys
 ```
 
 Puis y ajouter la clé ssh de l'utilisateur. Cette suite d'étape terminée, vérifier que l'utilisateur arrive bien à se connecter en root.
