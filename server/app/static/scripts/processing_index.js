@@ -1,6 +1,15 @@
 // Image Style selection
 image_style_selected = transfer.model
 
+// Show the handsontable if the screen is big enough
+window.onload = function(){
+  if ($(document).width()<992){
+    document.getElementById("hot").style.display = "none"
+  } else {
+    document.getElementById("hot").style.display = "block"
+  }
+}
+
 var image_click = function(image){
    $('.selected').removeClass('selected'); // removes the previous selected class
    $(image).addClass('selected'); // adds the class to the clicked image
@@ -8,33 +17,33 @@ var image_click = function(image){
 };
 
 // AJAX Query
-$("#apply_style_button").on("touchstart click",function() {
-  $.ajax({
-    url: "/treatment",
-    type: "POST",
-    data: JSON.stringify({
-      "image": ajax_binary_image, // Send the binary of the input chart image
-      "model": image_style_selected,//$("input:radio[name ='selection_model']:checked").val(), // Send the chosen model
-      "distribution": current_distribution,
-      "datapoints": data.join(','),
-      'grid': gridding.mode(),
-      'orientation': gridding.orient(),
-      'ratio': current_ratio
-    }),
-    contentType: "application/json; charset=utf-8",
-    beforeSend: function() {
-      //document.getElementById("download_button").style.visibility = "hidden" //hidden the download option
-      document.getElementById("spinning_wheel").style.visibility = "visible";    /*showing  a div with spinning image */
-    },
-    success: function(response) {
-      document.getElementById("spinning_wheel").style.visibility = "hidden";
-      document.getElementById("download_button").style.visibility = "visible" //show the download option
-      $("#result_image").attr("src", "static/output_images/" + response + ".jpg") //Update the result image
-      document.getElementById('download_link').setAttribute("href","static/output_images/" + response + ".jpg") //Update the download target
-      history.pushState(window.location.href, "index", "?token=" + response)
-    }
-  })
-});
+$("#apply_style_button").on("touchstart click", function(){
+    $.ajax({
+      url: "/treatment",
+      type: "POST",
+      data: JSON.stringify({
+        "image": ajax_binary_image, // Send the binary of the input chart image
+        "model": image_style_selected,
+        "distribution": current_distribution,
+        "datapoints": data.join(','),
+        'grid': gridding.mode(),
+        'orientation': gridding.orient(),
+        'ratio': current_ratio
+      }),
+      contentType: "application/json; charset=utf-8",
+      beforeSend: function() {
+        document.getElementById("spinning_wheel").style.visibility = "visible";    /*showing  a div with spinning image */
+      },
+      success: function(response) {
+        document.getElementById("spinning_wheel").style.visibility = "hidden";
+        document.getElementById("download_button").style.visibility = "visible" //show the download option
+        $("#result_image").attr("src", "static/output_images/" + response + ".jpg") //Update the result image
+        document.getElementById('download_link').setAttribute("href","static/output_images/" + response + ".jpg") //Update the download target
+        history.pushState(window.location.href, "index", "?token=" + response)
+      }
+    })
+  });
+
 
 var width = 450,
   height = 300;
@@ -62,9 +71,25 @@ var current_distribution = transfer.distribution; //distribution
 if (transfer.token !== "placeholder") {
   data = transfer.datapoints.split(",").map(Number);
   nb_data = data.length;
+  data_handson = data.map(function(d,i){
+    return({
+      index: i,
+      value: d,
+      __selected: false,
+      __highlighted: false
+    })
+  })
 } else {
   nb_data = 10;
   data = generate_data(nb_data);
+  data_handson = data.map(function(d,i){
+    return({
+      index: i,
+      value: d,
+      __selected: false,
+      __highlighted: false
+    })
+  })
 }
 
 var all_modes = ["horizontal", "vertical", "treemap"];
@@ -73,25 +98,72 @@ var distribution_change = function() {
   current_distribution = distributions[(distributions.indexOf(current_distribution) + 1) % distributions.length];
   console.log("current distribution", current_distribution)
   data = generate_data(nb_data, current_distribution);
+  data_handson = data.map(function(d,i){
+    return({
+      index: i,
+      value: d,
+      __selected: false,
+      __highlighted: false
+    })
+  })
+  hot.updateSettings({
+    data: data_handson
+  });
   draw();
 }
 
 var add_point = function() {
   nb_data++;
-  data = generate_data(nb_data, current_distribution);
+  data.push(Math.floor(d3.mean(data)))
+  data_handson = data.map(function(d,i){
+    return({
+      index: i,
+      value: d,
+      __selected: false,
+      __highlighted: false
+    })
+  })
+  hot.updateSettings({
+    data: data_handson
+  });
   console.log("new size: ", nb_data)
   draw();
 }
 
 var remove_point = function() {
-  nb_data--;
-  data = generate_data(nb_data, current_distribution);
-  console.log("new size: ", nb_data)
-  draw();
+  if (nb_data == 1){
+  } else {
+    nb_data--;
+    data.pop()
+    data_handson = data.map(function(d,i){
+      return({
+        index: i,
+        value: d,
+        __selected: false,
+        __highlighted: false
+      })
+    })
+    hot.updateSettings({
+      data: data_handson
+    });
+    console.log("new size: ", nb_data)
+    draw();
+  }
 }
 
 var randomize = function() {
   data = generate_data(nb_data, current_distribution);
+  data_handson = data.map(function(d,i){
+    return({
+      index: i,
+      value: d,
+      __selected: false,
+      __highlighted: false
+    })
+  })
+  hot.updateSettings({
+    data: data_handson
+  });
   console.log("new valueWidth: ", gridding.valueWidth());
   draw();
 }
@@ -257,39 +329,11 @@ var svg = d3.select("#preview")
   .attr("viewBox", "0 0 " + width + " " + height)
   .attr("perserveAspectRatio", "xMinYMid")
 
-// svg.append('svg:image')
-//   .attr("xlink:href","http://www.iconpng.com/png/beautiful_flat_color/computer.png")
-//   .attr("x",0)
-//   .attr("y",0)
-//   .attr("width",200)
-//   .attr("height",200);
-
-// var max = { x: 230, y: 152}
-// var imgUrl = "http://thedali.org/wp-content/uploads/2015/04/main_feature_image.png";
-//
-// svg.append("defs")
-//     .append("pattern")
-//     .attr("id", "venus")
-//     .attr('patternUnits', 'userSpaceOnUse')
-//     .attr("width", max.x)
-//     .attr("height", max.y)
-//     .append("image")
-//     .attr("xlink:href", imgUrl)
-//     .attr("width", max.x)
-//     .attr("height", max.y);
-//
-// svg.append("rect")
-//     .attr("x", "0")
-//     .attr("y", "0")
-//     .attr("width", max.x)
-//     .attr("height", max.y)
-//     .attr("fill", "url(#venus)");
-
 function draw() {
-  var griddingData = gridding(data);
+  var griddingData = gridding(data_handson.map(a => a.value));
 
   var squares = svg.selectAll(".square")
-    .data(griddingData);
+      .data(griddingData)//, function(d, i) { return d[var_id]; })
 
   squares.enter().append("rect")
     .attr("class", "square")
@@ -300,11 +344,26 @@ function draw() {
       return d.width;
     })
     .attr("height", function(d) {
+      console.log(d)
       return d.height;
     })
     .attr("transform", function(d) {
       return "translate(" + (d.x) + "," + (d.y) + ")";
-    });
+    })
+    .on("click", function(d, i) {
+      if ($(document).width()<992){
+      } else {
+        d3.event.stopPropagation();
+
+        data_handson.forEach(function(e) {
+          e.__selected = false;
+        });
+
+        data_handson[i].__selected = true;
+
+        hot.selectCell(data_handson[i][var_id], 0);
+      }
+    })
 
   squares.transition()
     .attr("width", function(d) {
@@ -312,6 +371,13 @@ function draw() {
     })
     .attr("height", function(d) {
       return d.height;
+    })
+    .style("fill", function(d,i) {
+      if(data_handson[i].__selected) {
+        return "red";
+      } else {
+        return "white";
+      }
     })
     .attr("transform", function(d) {
       return "translate(" + (d.x) + "," + (d.y) + ")";
@@ -323,8 +389,8 @@ function draw() {
   squares.exit().remove();
 
   // var indexes = svg.selectAll(".index")
-  // 	.data(griddingData);
-
+  // 	.data(griddingData, function(d, i) { return d[var_id]; });
+  //
   // indexes.enter().append("text")
   // 	.attr("class", "index")
   // 	.style('text-anchor', 'middle')
@@ -335,7 +401,7 @@ function draw() {
   // 	.text(function(d, i) {
   // 		return d.__value;
   // 	});
-
+  //
   // indexes.transition()
   // 	.attr("transform", function(d) {
   // 		return "translate(" + d.cx + "," + d.cy + ")";
@@ -350,8 +416,29 @@ function draw() {
 // Define variable to be passed in AJAX
 var ajax_binary_image;
 
+function neutralize(){
+  // Remove the red fill
+  var svg = d3.select("#svg_preview")
+  svg.selectAll("rect")
+    .style('fill', 'white')
+}
+
+function activate(){
+  // Set the red fill
+  var svg = d3.select("#svg_preview")
+  svg.selectAll("rect")
+    .style('fill', function(d,i){
+      if (data_handson[i].__selected === true){
+        return "red"
+      } else {
+        return "white"
+      }
+    })
+}
+
 // from svg to png https://gist.github.com/vicapow/758fce6aa4c5195d24be
 function render_image() {
+  neutralize() // Export the canvas without the red fill
 
   d3.select("#render-canvas").remove();
   d3.select("#render-img").remove();
@@ -418,8 +505,7 @@ function render_image() {
     ajax_binary_image = canvasUrl
   })
 
-  // start loading the image.
-  //img.src = url;
+  activate() //restore the red fill
 }
 
 draw();
@@ -459,11 +545,63 @@ function generate_data(s, d = "random", p) {
 
   var bins = d3.histogram()
     .domain(x.domain())
-    //.thresholds(x.ticks(s))
+    // .thresholds(x.ticks(s))
     .thresholds(d3.range(0, 1, 1 / s))
-    (data);
+    (data)//.map(a => a.value))
 
   return bins.map(function(d) {
     return d.length;
   });
+}
+
+var hotElement = document.querySelector('#hot');
+var hotElementContainer = hotElement.parentNode;
+var var_id = "index";
+var var_value = var_id;
+
+var hotSettings = {
+  data: data_handson,
+  className: "htLeft",
+  columns: [
+    {
+      data: 'value',
+      type: 'numeric',
+    }
+  ],
+  width: document.getElementById("charts").offsetWidth/16,
+  height: document.getElementById("hot").offsetWidth*3.75,
+  colWidths: document.getElementById("hot").offsetWidth * 4/5,
+  autoWrapRow: true,
+  afterChange: function() {
+    console.log("afterChange")
+    data = data_handson.map(a => a.value)
+    draw();
+  },
+  afterSelection: function (changes, source) {
+    data_handson.forEach(function(d) {
+      d.__selected = false;
+    })
+
+    var sel = hot.getSelected();
+
+    data_handson[sel[0][0]].__selected = true;
+    draw();
+  },
+  afterDocumentKeyDown: function(a, b) {
+    console.log("afterDocumentKeyDown", a, b)
+  }
+};
+
+var hot = new Handsontable(hotElement, hotSettings);
+
+d3.select("body").append("button").on("click", function() {
+  current_layout = layouts[(layouts.indexOf(current_layout) + 1) % layouts.length];
+  draw()
+});
+
+window.onresize = function(){
+  if ($(document).width()<992){
+    document.getElementById("hot").style.display = "none"
+  } else {
+  }
 }
