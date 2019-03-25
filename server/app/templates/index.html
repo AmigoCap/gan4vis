@@ -17,11 +17,13 @@
 		<div id="title_result" style="width:35%; float:right; font-size:1.2vw; text-align:center;margin-left:7.5%;margin-right:7.5%;font-weight: bold">Stylized Visualization</div>
 </div>
 <div id="charts" class="container" style="width:100%; height:auto; display: flex;justify-content: space-between; padding-left:0; padding-right:0;">
-	<div id="choice_background" style="width:7.5%; float: left"></div>
+	<div id="enter" style="width:5%; float: left; margin-right:2.5%; display:flex;flex-direction:column;justify-content:space-evenly">
+		<div id="hot"></div>
+	</div>
 	<div id="preview" style="width:35%; height:auto; float: left"></div>
 	<div id="submission" style="width:10%; height:auto; margin-left:2.5%; margin-right:2.5%;display:flex;flex-direction:column;justify-content:center">
 		<div style="width:40%;margin-left:30%; margin-right:30%"><i class="fa fa-long-arrow-right" style="font-size:3.5vw;color:#d9534f"></i></div>
-		<button id="apply_style_button" class="btn btn-danger btn-lg" type="submit" style="width:100%;padding: 10% 0% ;float:left;margin-top:10%;margin-bottom:10%">
+		<button id="apply_style_button" class="btn btn-danger btn-lg" type="submit" style="width:100%;padding: 10% 0% ;float:left;margin-top:10%;margin-bottom:10%;visibility:visible">
 			<div class="button_submission">Apply Style</div>
 		</button>
 		<img id="spinning_wheel" src="static/utilitaries_images/spinning.gif" style="width:40%; margin-left:30%; margin-right:30%;visibility:hidden">
@@ -126,7 +128,7 @@
 					<a class="fa fa-github" target="_blank" href="https://github.com/clevecque" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
 				</td>
 				<td style="width:16.5%">
-					<div class="collaborators_name">Clémence Lévêcque</div>
+					<div class="collaborators_name">Clémence Lévecque</div>
 				</td>
 				<td style="width:5%">
 					<a class="fa fa-linkedin" target="_blank" href="https://www.linkedin.com/in/william-pierre-93458a11b/" style="font-size:2vw; text-decoration: none; color:#24292e"></a>
@@ -165,6 +167,9 @@
 </script>
 <script src="{{url_for('static', filename="scripts/d3.js")}}"></script>
 <script src="{{url_for('static', filename="scripts/d3-gridding.js")}}"></script>
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/handsontable.full.min.css')}}">
+<script src="{{url_for('static', filename='scripts/handsontable.full.min.js')}}"></script>
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/table.css')}}">
 <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/styles.css')}}">
-<script src="{{url_for('static', filename="scripts/processing_index.js")}}"></script>
+<script src="{{url_for('static', filename='scripts/processing_index.js')}}"></script>
 {% endblock %}

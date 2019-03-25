@@ -1,0 +1,11 @@
+.currentRow {
+  background-color: red !important;
+}
+.currentCol {
+  background-color: #F9F9FB !important;
+}
+
+/* https://stackoverflow.com/questions/32019489/duplicate-headers-when-using-handsontable */
+.ht_clone_top, .ht_clone_top_left_corner, .ht_clone_left, .ht_clone_bottom, #hot-display-license-info {
+  display: none! important;
+}
