@@ -27,7 +27,7 @@ Les données manipulées par l'application sont de trois formes, modèles, image
 
 **Modèles**
 
-Les modèles sont des fichiers .pth stockés dans le dossier gan4vis/server/app/gan/saved_models/. Nous pouvons générer les modèles pour l'application de transfert de style comme pour celle de transitions. [William]
+Les modèles sont des fichiers .pth stockés dans le dossier gan4vis/server/app/gan/saved_models/. Nous pouvons générer les modèles pour l'application de transfert de style comme pour celle de transitions. Pour entrainer un modèle il suffit de suivre la procédure expliquée sur page de [fast-neural-style](https://github.com/pytorch/examples/tree/master/fast_neural_style "GitHub de fast-neural-style") qui est l'implémentation en pytorch que nous avons utilisé.
 
 **Images**
 
