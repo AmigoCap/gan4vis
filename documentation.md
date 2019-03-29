@@ -1,10 +1,28 @@
 # Documentation
 
-Le fichier suivant détail le fonctionnement de l'application ainsi que la configuration du serveur Digital Ocean, à l'issue du mois de mars 2019.
+Le fichier suivant détail le fonctionnement de l'application ainsi que la configuration du serveur Digital Ocean, à l'issue du mois de mars 2019. Voici la structure de la documentation :
 
-## Application
+[Application](#application)
+* Structure
+* Données
+* Processus
+* Travailler en local avec l'application
 
-### Structure
+[Serveur](#serveur)
+* Accès au serveur
+* NGINX
+* Python, Gunicorn & Flask
+* Mise à jour de l'application
+
+# Application
+
+Nous détaillons dans cette partie les aspects important de l'application. Nous évoquons ainsi :
+* **Structure** : quelles sont les pièces de l'application et comment elles intéragissent en elles.
+* **Données** : quelles sont les différentes données utilisées par l'application et en quoi elles sont utiles.
+* **Processus** : quels sont les processus importants à l'oeuvre lors de l'exécution de l'application.
+* **Travailler en local avec l'application** : comment mettre en place localement le repository GitHub de l'application
+
+## Structure
 
 Le [site](https://gan4vis.net) actuel est constitué de quatre pages web. 
 
@@ -21,19 +39,19 @@ L'application permettant de gérer ce site a une structure MVT (Model View Templ
 
 Sur le schéma précédent, les templates sont en bleu. En blanc se trouvent les View (routes.py) et les Model (models.py). Un fichier python appelé neural_style.py permet le chargement et l'application des modèles de transfert de style utilisés.
 
-### Données
+## Données
 
 Les données manipulées par l'application sont de trois formes, modèles, images et base SQLite
 
-**Modèles**
+### Modèles
 
 Les modèles sont des fichiers .pth stockés dans le dossier gan4vis/server/app/gan/saved_models/. Nous pouvons générer les modèles pour l'application de transfert de style comme pour celle de transitions. Pour entrainer un modèle il suffit de suivre la procédure expliquée sur page de [fast-neural-style](https://github.com/pytorch/examples/tree/master/fast_neural_style "GitHub de fast-neural-style") qui est l'implémentation en pytorch que nous avons utilisé.
 
-**Images**
+### Images
 
 Les images stockées sur le serveur correspondent aux images générées lors de chaque transfer de style ainsi que les images utiles dans les affichages divers. Toutes les images se trouve dans les sous dossiers de gan4vis/server/app/static.
 
-**Base SQLite**
+### Base SQLite
 
 Nous avons opté pour une base SQLite pour enregistrée les configurations des transferts de style réalisés. Cette base correspond au fichier gan4vis/server/app.db. Elle est constituée d'une unique table appelée transfer. Nous avons fait le choix d'utiliser [SQLAlchemy](https://www.sqlalchemy.org/) pour travailler avec la base dans notre application. La structure de la base est reliée au fichier "models.py". Celui-ci defini une class appelée "Transfer" qui correspond à la table de la base. Les colonnes de cette table correspondent aux aspects des transferts de style dont nous souhaitons garder la trace. Ci-dessous un exemple d'entrée de la table.
 
@@ -59,11 +77,11 @@ $ flask db upgrade
 
 Des modifications importantes pourront nécessiter une adaptation des données précédentes et donc une intervention sur la base. Nous renvoyons vers le [tutoriel Flask de Miguel Grinberg](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database) pour voir comment accéder et modifier la base de données depuis la ligne de commande.
 
-### Processus
+## Processus
 
 Nous allons à présent détailler le processus à l'oeuvre lors de l'utilisation de chacune des pages web. Nous détaillerons plus particulièrement les opérations liées au transfert de style et à la transition.
 
-**Transfert et transition**
+### Transfert et transition 
 
 <p align="center">
 <img src="server/app/static/utilitaries_images/structure_process.png" width="75%">
@@ -103,11 +121,11 @@ Nous allons à présent détailler le processus à l'oeuvre lors de l'utilisatio
   </tr>
 </table>
 
-**Dashboard**
+### Dashboard
 
 Un système de dashboard a été mis en place afin de rendre compte de l'utilisation de la partie transfer de style ouverte au public. Une simple route appelée "dashboard" a été créée. Elle parcourt la base de données afin d'envoyer au client les données d'utilisation. Le client les exploite ensuite à l'aide de D3.js (version 5) afin de créer les graphiques.
 
-**Partage d'URL**
+### Partage d'URL
 
 Nous avons souhaité pourvoir partager notre application de transfert de style par URL. Le but étant qu'après avoir généré un transfert, je puisse le partager à quelqu'un qui rechargerait la page à son tour avec toutes les données d'entrée et sortie de l'image initiale. La route "index" est le coeur du processus qui permet cela
 
@@ -130,9 +148,38 @@ Cette route est la fonction déclenchée sur le serveur à chaque fois qu'un uti
 
 Par la suite, un dictionaire est initialisé dans la route en fonction de la présence d'information sur le token. Si le token est spécifié, une configuration lui correspondant sera cherchée dans la base de donnée. Sinon une configuration par défaut sera utilisée. Enfin, les codes html et javascript utilisés sur le client on été adaptés afin de fonctionner dans les deux cas. 
 
-**Comment travailler en local avec l'application**
+## Travailler en local avec l'application
 
-## Serveur
+Pour travailler en local avec l'application, il suffit de cloner le respository sur votre machine.
+
+```console
+$ git clone https://github.com/AmigoCap/gan4vis.git
+```
+Avant de lancer l'application trois points doivent être configurés. En effet, une base de données sqlite et les fichiers de logs doivent être configurés.
+
+Tout d'abord installer les requirements nécessaires liés au fichiers gan4vis/server/requirements.txt.
+
+```console
+$ pip install -r requirements.txt
+```
+
+Par expérience l'installation de PyTorch peut être délicate. Installer donc PyTorch manuellement. La manière de procéder la plus simple semble être d'aller sur [le site de PyTorch](https://pytorch.org/) et de déterminer la commande pip en fonction de la configuration de la machine. La version de PyTorch sans CUDA peut être utilisée.
+
+Configurer ensuite les logs en créant le fichier qui les stockera :
+
+```console
+$ mkdir logs
+```
+
+Pour configurer la base de données, entrer les commandes suivantes :
+
+```console
+$ flask db init
+$ flask db migrate -m "Database Initialization"
+$ flask db upgrade
+```
+
+# Serveur
 
 À fin mars 2019 le serveur à la configuration suivante : 
 
@@ -140,13 +187,13 @@ Par la suite, un dictionaire est initialisé dans la route en fonction de la pr�
 * 160 GB Disk
 * Ubuntu 18.04.1 x64
 
-Nous détaillons ci-dessous les aspects important de la gestion et de la mise en place du serveur. Nous évoquons ainsi :
+Nous détaillons dans cette partie les aspects important de la gestion et de la mise en place du serveur. Nous évoquons ainsi :
 * **Accès au serveur** : comment se connecter en SSH et créer de nouveaux utilisateurs ayant des droits administrateurs.
 * **NGINX** : comment et configurer le serveur web qui constitue la base de l'application
 * **Python, Gunicorn & Flask** : comment configurer Gunicorn et Flask au dessus de NGINX pour finaliser le déploiement de l'application
-* **Mise à jour** : comment mettre à jour l'application au fil de l'évolution du présent repo GitHub.
+* **Mise à jour de l'application** : comment mettre à jour l'application au fil de l'évolution du présent repo GitHub.
 
-### Accès au serveur
+## Accès au serveur
 
 Les ressources nécessaires à la création d'un utilisateur et à l'administration de ses droits peuvent être trouvées ci-dessous :
 * [Initial Server Setup with Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04)
@@ -154,7 +201,7 @@ Les ressources nécessaires à la création d'un utilisateur et à l'administrat
 
 L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons ci-dessous succintement les étapes nécessaires à la création d'un nouvel utilisateur. Il est conseillé de faire les étapes suivantes en root. 
 
-**0. Activer le firewall**
+### 0. Activer le firewall
 
 Une configuration du firewall est nécessaire Dans notre cas, elle se résume à :
 
@@ -163,7 +210,7 @@ ufw allow OpenSSH
 ufw enable
 ```
 
-**1. Créer un nouvel utilisateur**
+### 1. Créer un nouvel utilisateur
 
 Créons à présent l'utilisateur.
 
@@ -173,13 +220,13 @@ Créons à présent l'utilisateur.
 
 Entrez alors les informations requises ainsi que son mot de passe. 
 
-**2. Donner l'accès root à l'utilisateur** 
+### 2. Donner l'accès root à l'utilisateur
 
 ```console
 # usermod -aG sudo utilisateur
 ```
 
-**3. Configurer le SSH du nouvel utilisateur pour l'accès root** 
+### 3. Configurer le SSH du nouvel utilisateur pour l'accès root 
 
 Ouvrir le fichier "~/.ssh/authorized_keys" du root :
 
@@ -189,7 +236,7 @@ Ouvrir le fichier "~/.ssh/authorized_keys" du root :
 
 Puis y ajouter la clé ssh de l'utilisateur. Cette suite d'étape terminée, vérifier que l'utilisateur arrive bien à se connecter en root.
 
-**4. Configurer le SSH du nouvel utilisateur pour accès utilisateur** 
+### 4. Configurer le SSH du nouvel utilisateur pour accès utilisateur 
 
 La configuration se fait automatiquement sur demande de l'utilisateur. Il lui suffit d'ouvrir une session dans sa console et de rentrer la ligne suivante. Il aura alors à rentrer le mot de passe root.
 
@@ -199,7 +246,7 @@ $ ssh-copy-id utilisateur@ip-server
 
 Une fois l'opération terminée, l'utilisateur pourra se connecter normalement au serveur en ssh. Si la commande ssh-copy-id ne fonctionne pas, cela signifie que votre système ne la supporte pas, reportez-vous alors à [How to Set Up SSH Keys on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804).
 
-### NGINX
+## NGINX
 
 Maintenant qu'un utilisateur tout puissant est configuré, nous allons pouvoir créer l'application. 
 
@@ -211,7 +258,7 @@ Les ressources utilisées sont disponibles ici :
 En pré-requis de cette étape, nous considérons que :
 *Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
 
-**1. Installation**
+### 1. Installation
 
 Installer tout dabord la dernière version de NGINX.
 
@@ -220,7 +267,7 @@ $ sudo apt update
 $ sudo apt install nginx
 ```
 
-**2. Configuration du pare-feu**
+### 2. Configuration du pare-feu
 
 Autoriser NGINX à gérer les requêtes :
 
@@ -228,7 +275,7 @@ Autoriser NGINX à gérer les requêtes :
 $ sudo ufw allow 'Nginx HTTP'
 ```
 
-**3. Vérification**
+### 3. Vérification
 
 Vérifier que les requêtes avec NGINX sont bien autorisées :
 
@@ -267,7 +314,7 @@ nginx.service - A high performance web server and a reverse proxy server
            └─2380 nginx: worker process
 ```
 
-### Python, Gunicorn & Flask
+## Python, Gunicorn & Flask
 
 L'ensemble des ressources utilisées se trouvent au lien suivant : 
 * [How To Serve Flask Applications with Gunicorn and Nginx on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04)
@@ -278,7 +325,7 @@ En pré-requis de cette étape, nous considérons que :
 * Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
 * NGINX a été configuré et est actif comme présenté précédemment.
 
-**1. Installation Python et dépendances**
+### 1. Installation Python et dépendances
 
 Installons tout d'abord Python et l'ensemble des ressources associées
 
@@ -287,7 +334,7 @@ $ sudo apt update
 $ sudo apt install python3-pip python3-dev build-essential libssl-dev libffi-dev python3-setuptools
 ```
 
-**2. Création du dossier du serveur**
+### 2. Création du dossier du serveur
 
 Avant d'aller plus loin, faisons un point sur la structure actuelle des dossiers de la machine. L'entrée de la commande `pwd` doit vous donner l'affichage suivant : 
 
@@ -316,7 +363,7 @@ Créer maintenant un clone du directory GitHub dans le dossier `/home/utilisateu
 $ git clone https://github.com/AmigoCap/gan4vis.git
 ```
 
-**3. Initialiser un environnement virtuel**
+### 3. Initialiser un environnement virtuel
 
 Comme notre serveur ne se trouve pas directement à la racine du repository GitHub. Déplaçons-nous donc maintenant dans le dossier de l'application pour réaliser les étapes suivantes.
 
@@ -356,18 +403,20 @@ Installer ensuite l'ensemble des modules utilisés par l'application. Pour cela 
 $ pip install -r requirements.txt
 ```
 
-Par expérience l'installation de PyTorch peut être délicate. Nous décidons donc d'installer PyTorch manuellement. La manière de procéder la plus simple semble être d'aller sur [le site de PyTorch](https://pytorch.org/) et de déterminer la commande pip en fonction de la configuration de la machine. Dans notre cas :
+Par expérience l'installation de PyTorch peut être délicate. Nous décidons donc d'installer PyTorch manuellement. La manière de procéder la plus simple semble être d'aller sur [le site de PyTorch](https://pytorch.org/) et de déterminer la commande pip en fonction de la configuration de la machine. La version de PyTorch sans CUDA peut être utilisée. Dans notre cas :
 
-**Ajouter image**
+<p align="center">
+<img src="server/app/static/utilitaries_images/configuration_pytorch.png" width="80%">
+</p>
 
-Nous installons donc PyTorch de la manière suivante : 
+Nous installons donc de la manière suivante, d'après les informations fournies par le site de PyTorch : 
 
 ```console
 $ pip install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp36-cp36m-linux_x86_64.whl
 $ pip install torchvision
 ```
 
-**4. Configurer l'application
+### 4. Configurer l'application
 
 Nous devons maintenant terminer de configurer l'application. En effet, les modules sont installés mais l'application téléchargée depuis GitHub ne peut tourner. En effet, nous avons fait le choix de ne pas stocker sur GitHub notre base de données ainsi que nos logs. Nous avons donc besoin d'initialiser ces deux points.
 
@@ -386,7 +435,7 @@ $ flask db migrate -m "Database Initialization"
 $ flask db upgrade
 ```
 
-**5. Configurer Gunicorn et lancer le serveur**
+### 5. Configurer Gunicorn et lancer le serveur
 
 Avant d'aller plus loin, nous allons vérifier que toutes les étapes précédentes se sont bien passées en simulant un fonctionnement de l'application. Autoriser tout dabord le pare-feu pour le port 5000 : 
 
@@ -503,21 +552,21 @@ $ sudo ufw allow 'Nginx Full'
 
 Si votre DNS est configuré, vous devriez pouvoir accéder au site avec à http://gan4vis.net
 
-### Mise à jour
+## Mise à jour de l'application
 
 Le serveur utilise la version de l'application présente sur GitHub. Le serveur tourne à partir de la branche master. Voici les étapes nécessaires à la mise à jour du serveur à la suite d'une modification sur GitHub.
 
-**1. Se connecter en SSH en tant qu'utilisateur au serveur** 
+### 1. Se connecter en SSH en tant qu'utilisateur au serveur 
 
-**2. Se rendre dans le dossier "home/guillaume/gan4vis"**
+### 2. Se rendre dans le dossier "home/guillaume/gan4vis"
 
-**3. Faire un pull des modifications**
+### 3. Faire un pull des modifications
 
 ```console
 $ git pull origin master
 ```
 
-**4. Relancer Gunicorn** 
+### 4. Relancer Gunicorn 
 
 ```console
 $ sudo systemctl restart server
@@ -525,7 +574,7 @@ $ sudo systemctl enable server
 $ sudo systemctl status server 
 ```
 
-**5. Relancer NGINX**
+### 5. Relancer NGINX
 
 ```console
 $ sudo systemctl restart nginx 
