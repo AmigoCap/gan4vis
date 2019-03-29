@@ -516,12 +516,12 @@ Nous allons enfin finaliser la configuration de NGINX. Cela passe par la créati
 $ sudo nano /etc/nginx/sites-available/server
 ```
 
-À remplir avec le contenu suivant dans lequel vous aurez adapté le nom de domaine et l'utilisateur.
+À remplir avec le contenu suivant que vous aurez adapté.
 
 ```console
 server {
     listen 80;
-    server_name your_domain www.your_domain;
+    server_name gan4vis.net www.gan4vis.net;
 
     location / {
         include proxy_params;
@@ -551,6 +551,29 @@ $ sudo ufw allow 'Nginx Full'
 ```
 
 Si votre DNS est configuré, vous devriez pouvoir accéder au site avec à http://gan4vis.net
+
+### 6. Passer en HTTPS
+
+Il est possible d'obtenir un "Self-signed SSL Certificate for Nginx in Ubuntu 18.04" d'après la ressource Digital Ocean. Nous présentons ici succintement les commandes qui le permettent.
+
+```console
+$ sudo add-apt-repository ppa:certbot/certbot
+$ sudo apt install python-certbot-nginx
+```
+
+La commande suivante demandera de renseigner une addresse électronique et d'accepter les conditions générales. Il sera aussi demandé de choisir entre une redirection systématique de HTTP vers HTTPS.
+
+```console
+$ sudo certbot --nginx -d gan4vis.net -d www.gan4vis.net
+```
+
+Terminer en mettant à jour le firewall :
+
+```console
+sudo ufw delete allow 'Nginx HTTP'
+```
+
+L'application doit alors pouvoir être accédée.
 
 ## Mise à jour de l'application
 
