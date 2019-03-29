@@ -130,6 +130,8 @@ Cette route est la fonction déclenchée sur le serveur à chaque fois qu'un uti
 
 Par la suite, un dictionaire est initialisé dans la route en fonction de la présence d'information sur le token. Si le token est spécifié, une configuration lui correspondant sera cherchée dans la base de donnée. Sinon une configuration par défaut sera utilisée. Enfin, les codes html et javascript utilisés sur le client on été adaptés afin de fonctionner dans les deux cas. 
 
+**Comment travailler en local avec l'application**
+
 ## Serveur
 
 À fin mars 2019 le serveur à la configuration suivante : 
@@ -138,7 +140,11 @@ Par la suite, un dictionaire est initialisé dans la route en fonction de la pr�
 * 160 GB Disk
 * Ubuntu 18.04.1 x64
 
-Nous détaillons ci-dessous les aspects important de la gestion et de la mise en place du serveur
+Nous détaillons ci-dessous les aspects important de la gestion et de la mise en place du serveur. Nous évoquons ainsi :
+* **Accès au serveur** : comment se connecter en SSH et créer de nouveaux utilisateurs ayant des droits administrateurs.
+* **NGINX** : comment et configurer le serveur web qui constitue la base de l'application
+* **Python, Gunicorn & Flask** : comment configurer Gunicorn et Flask au dessus de NGINX pour finaliser le déploiement de l'application
+* **Mise à jour** : comment mettre à jour l'application au fil de l'évolution du présent repo GitHub.
 
 ### Accès au serveur
 
@@ -148,13 +154,24 @@ Les ressources nécessaires à la création d'un utilisateur et à l'administrat
 
 L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons ci-dessous succintement les étapes nécessaires à la création d'un nouvel utilisateur. Il est conseillé de faire les étapes suivantes en root. 
 
+**0. Activer le firewall**
+
+Une configuration du firewall est nécessaire Dans notre cas, elle se résume à :
+
+```console
+ufw allow OpenSSH
+ufw enable
+```
+
 **1. Créer un nouvel utilisateur**
+
+Créons à présent l'utilisateur.
 
 ```console
 # adduser utilisateur
 ```
 
-Entrez alors les informations requises. 
+Entrez alors les informations requises ainsi que son mot de passe. 
 
 **2. Donner l'accès root à l'utilisateur** 
 
@@ -180,12 +197,18 @@ La configuration se fait automatiquement sur demande de l'utilisateur. Il lui su
 $ ssh-copy-id utilisateur@ip-server
 ```
 
+Une fois l'opération terminée, l'utilisateur pourra se connecter normalement au serveur en ssh. Si la commande ssh-copy-id ne fonctionne pas, cela signifie que votre système ne la supporte pas, reportez-vous alors à [How to Set Up SSH Keys on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804).
+
 ### NGINX
+
+Maintenant qu'un utilisateur tout puissant est configuré, nous allons pouvoir créer l'application. 
 
 Les ressources utilisées sont disponibles ici :
 * [How To Install Nginx on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04)
 
-[NGINX](https://fr.wikipedia.org/wiki/NGINX) est la première couche sur laquelle est assise l'application. NGINX permet entre autres la gestion des requêtes. Nous détaillons ci-dessous les étapes nécessaire au paramétrage de NGINX sur une machine Ubuntu 18.04.1. En pré-requis de cette étape, nous considérons que :
+[NGINX](https://fr.wikipedia.org/wiki/NGINX) est la première couche sur laquelle est assise l'application. NGINX permet entre autres la gestion des requêtes. Nous détaillons ci-dessous les étapes nécessaire au paramétrage de NGINX sur une machine Ubuntu 18.04.1. 
+
+En pré-requis de cette étape, nous considérons que :
 *Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
 
 **1. Installation**
@@ -213,11 +236,23 @@ Vérifier que les requêtes avec NGINX sont bien autorisées :
 $ sudo ufw status
 ```
 
+Dans l'état actuel du serveur, les lignes suivantes apparaissent.
+
+```console
+To                         Action      From
+--                         ------      ----
+OpenSSH                    ALLOW       Anywhere                  
+Nginx HTTP                 ALLOW       Anywhere                  
+OpenSSH (v6)               ALLOW       Anywhere (v6)             
+Nginx HTTP (v6)            ALLOW       Anywhere (v6)      
+```
+
 Vérifier que tout fonctionne bien :
 
 ```console
 $ systemctl status nginx
 ```
+La sortie doit montrer l'activation du serveur : 
 
 ```console
 Output
@@ -237,9 +272,11 @@ nginx.service - A high performance web server and a reverse proxy server
 L'ensemble des ressources utilisées se trouvent au lien suivant : 
 * [How To Serve Flask Applications with Gunicorn and Nginx on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04)
 
-Cette étape permet la configuration des seconde et troisième couche de l'application. La seconde couche consiste en [Gunicorn](https://fr.wikipedia.org/wiki/Gunicorn) qui est un serveur web HTTP WSGI. La troisième couche correspond au serveur Flask. Nous présentons ci-dessous les étapes nécessaires à la configuration de ces deux couches. En pré-requis de cette étape, nous considérons que :
-*Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
-*NGINX a été configuré et fonctionne comme présenté précédemment.
+Cette étape permet la configuration des seconde et troisième couches de l'application. La seconde couche consiste en [Gunicorn](https://fr.wikipedia.org/wiki/Gunicorn) qui est un serveur web HTTP WSGI. La troisième couche correspond au serveur Flask. 
+
+En pré-requis de cette étape, nous considérons que :
+* Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
+* NGINX a été configuré et est actif comme présenté précédemment.
 
 **1. Installation Python et dépendances**
 
@@ -252,7 +289,7 @@ $ sudo apt install python3-pip python3-dev build-essential libssl-dev libffi-dev
 
 **2. Création du dossier du serveur**
 
-Avant d'aller plus loin, faisons un point sur la structure actuelle des dossiers de la machine. 
+Avant d'aller plus loin, faisons un point sur la structure actuelle des dossiers de la machine. L'entrée de la commande `pwd` doit vous donner l'affichage suivant : 
 
 ```console
 └── home
@@ -267,44 +304,47 @@ Nous voulons aller vers une structure qui ressemble à ça :
       └── gan4vis
 ```
 
-Nous allons donc à présent devoir créer le dossier de l'application. Nous allons simplement effectuer un git clone du directory GitHub. Avant cela installer Git :
+Nous allons donc à présent devoir créer le dossier de l'application. Nous allons simplement effectuer un git clone du directory GitHub. Nous avons tout d'abord à installer Git :
 
 ```console
 $ sudo apt-get install -y git
 ```
 
-Assurez-vous ensuite d'être dans le dossier `/home/utilisateur`? Créer maintenant un clone du directory GitHub :
+Créer maintenant un clone du directory GitHub dans le dossier `/home/utilisateur`:
 
 ```console
 $ git clone https://github.com/AmigoCap/gan4vis.git
 ```
-Notre serveur ne se trouve pas directement à la racine du directory GitHub. Déplaçons-nous donc maintenant dans le dossier de l'application :
+
+**3. Initialiser un environnement virtuel**
+
+Comme notre serveur ne se trouve pas directement à la racine du repository GitHub. Déplaçons-nous donc maintenant dans le dossier de l'application pour réaliser les étapes suivantes.
 
 ```console
 $ cd gan4vis/server
 ```
 
-**3. Initialiser un environnement virtuel**
-
-L'application utilise un certain nombre de modules Python. Nous allons donc créer un environnement virtuel afin de délimiter clairement le périmètre du serveur. Installons tout d'abord la ressource permettant de créer un environnement virtuel :
+L'application utilise un certain nombre de modules Python. Nous allons donc créer un environnement virtuel afin de délimiter clairement le périmètre du serveur. Installons tout d'abord la ressource permettant de créer un environnement virtuel.
 
 ```console
 $ sudo apt install python3-venv
 ```
 
-Créer l'environnement virtuel :
+Créons ensuite l'environnement virtuel.
 
 ```console
 $ python3.6 -m venv gan4vis_env
 ```
 
-Une fois l'environnement créé, nous allons l'activer en le définissant comme source. Cela permettra d'installer les modules nécessaires. À l'avenir, l'application utilisera toujours cet environnement virtuel.
+Une fois l'environnement créé, nous allons l'activer en le définissant comme source. Cela permettra d'installer les modules nécessaires. À terme, l'application utilisera toujours cet environnement virtuel.
 
 ```console
 $ source gan4vis_env/bin/activate
 ```
 
-Commencer par installer wheel
+La commande précédente doit avoir modifier votre console qui commence désormais par : `(gan4vis_env)`.
+
+Commençons à installer les modules. Tout d'abord, installer wheel.
 
 ```console
 $ pip install wheel
@@ -316,15 +356,45 @@ Installer ensuite l'ensemble des modules utilisés par l'application. Pour cela 
 $ pip install -r requirements.txt
 ```
 
-**4. Configurer Gunicorn et lancer le serveur**
+Par expérience l'installation de PyTorch peut être délicate. Nous décidons donc d'installer PyTorch manuellement. La manière de procéder la plus simple semble être d'aller sur [le site de PyTorch](https://pytorch.org/) et de déterminer la commande pip en fonction de la configuration de la machine. Dans notre cas :
 
-Nous allons tout d'abord vérifier que toutes les étapes précédentes se sont bien passées. Autoriser tout dabord le pare-feu : 
+**Ajouter image**
+
+Nous installons donc PyTorch de la manière suivante : 
+
+```console
+$ pip install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp36-cp36m-linux_x86_64.whl
+$ pip install torchvision
+```
+
+**4. Configurer l'application
+
+Nous devons maintenant terminer de configurer l'application. En effet, les modules sont installés mais l'application téléchargée depuis GitHub ne peut tourner. En effet, nous avons fait le choix de ne pas stocker sur GitHub notre base de données ainsi que nos logs. Nous avons donc besoin d'initialiser ces deux points.
+
+Pour configurer les logs, créer le fichier qui les stockera :
+
+
+```console
+$ mkdir logs
+```
+
+Pour configurer la base de données, entrer les commandes suivantes :
+
+```console
+$ flask db init
+$ flask db migrate -m "Database Initialization"
+$ flask db upgrade
+```
+
+**5. Configurer Gunicorn et lancer le serveur**
+
+Avant d'aller plus loin, nous allons vérifier que toutes les étapes précédentes se sont bien passées en simulant un fonctionnement de l'application. Autoriser tout dabord le pare-feu pour le port 5000 : 
 
 ```console
 $ sudo ufw allow 5000
 ```
 
-Lancer ensuite une première version du serveur. S'assurer d'être dans le dossier `home/utilisateur/gan4vis/server` :
+Lancer ensuite une première version du serveur. S'assurer d'être dans le dossier `home/utilisateur/gan4vis/server` et dans l'environnement virutel créé précédemment :
 
 ```console
 $ gunicorn --bind 0.0.0.0:5000 wsgi:app
@@ -336,13 +406,13 @@ L'URL doit permettre d'accéder à l'application http://ip-serveur:5000. Si tout
 $ deactivate
 ```
 
-Nous allons créer un premier fichier `server.service`. Pour cela, entrer la commande suivante :
+Nous allons maintenant configurer l'ensemble des fichiers nécessaires à la fin du déploiemen. Créons un premier fichier `server.service`. Pour cela, entrer la commande suivante :
 
 ```console
 $ sudo nano /etc/systemd/system/server.service
 ```
 
-Remplisser ensuite le fichier avec le contenu suivant en l'adaptant au nom de l'utilisateur :
+Remplir ensuite le fichier avec le contenu suivant en l'adaptant au nom de l'utilisateur :
 
 ```console
 [Unit]
@@ -360,32 +430,44 @@ ExecStart=/home/utilisateur/gan4vis/server/gan4vis_env/bin/gunicorn --workers 3 
 WantedBy=multi-user.target
 ```
 
+Entrer ensuite la série de commandes suivante : 
+
 ```console
 $ sudo systemctl start server
 $ sudo systemctl enable server
 $ sudo systemctl status server
 ```
 
-La sortie doit alors montrer que le serveur est actif :
+La sortie doit alors montrer que le serveur est actif. Le message doit ressembler à celui-ci :
 
 ```console
-myproject.service - Gunicorn instance to serve myproject
-   Loaded: loaded (/etc/systemd/system/myproject.service; enabled; vendor preset: enabled)
-   Active: active (running) since Fri 2018-07-13 14:28:39 UTC; 46s ago
- Main PID: 28232 (gunicorn)
-    Tasks: 4 (limit: 1153)
-   CGroup: /system.slice/myproject.service
-           ├─28232 /home/sammy/myproject/myprojectenv/bin/python3.6 /home/sammy/myproject/myprojectenv/bin/gunicorn --workers 3 --bind unix:myproject.sock -m 007
-           ├─28250 /home/sammy/myproject/myprojectenv/bin/python3.6 /home/sammy/myproject/myprojectenv/bin/gunicorn --workers 3 --bind unix:myproject.sock -m 007
-           ├─28251 /home/sammy/myproject/myprojectenv/bin/python3.6 /home/sammy/myproject/myprojectenv/bin/gunicorn --workers 3 --bind unix:myproject.sock -m 007
-           └─28252 /home/sammy/myproject/myprojectenv/bin/python3.6 /home/sammy/myproject/myprojectenv/bin/gunicorn --workers 3 --bind unix:myproject.sock -m 007
+● server.service - Gunicorn instance to serve server
+   Loaded: loaded (/etc/systemd/system/server.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-03-29 14:23:27 UTC; 29s ago
+ Main PID: 10564 (gunicorn)
+    Tasks: 4 (limit: 1152)
+   CGroup: /system.slice/server.service
+           ├─10564 /home/guillaume/gan4vis/server/gan4vis_env/bin/python3.6 /home/guillaume/gan4vis/server/gan4vis_env/bi
+           ├─10580 /home/guillaume/gan4vis/server/gan4vis_env/bin/python3.6 /home/guillaume/gan4vis/server/gan4vis_env/bi
+           ├─10581 /home/guillaume/gan4vis/server/gan4vis_env/bin/python3.6 /home/guillaume/gan4vis/server/gan4vis_env/bi
+           └─10583 /home/guillaume/gan4vis/server/gan4vis_env/bin/python3.6 /home/guillaume/gan4vis/server/gan4vis_env/bi
+
+Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 systemd[1]: Started Gunicorn instance to serve server.
+Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:27 +0000] [10564] [INFO] Starting gunicorn 
+Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:27 +0000] [10564] [INFO] Listening at: unix
+Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:27 +0000] [10564] [INFO] Using worker: sync
+Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:27 +0000] [10580] [INFO] Booting worker wit
+Mar 29 14:23:28 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:28 +0000] [10581] [INFO] Booting worker wit
+Mar 29 14:23:28 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:28 +0000] [10583] [INFO] Booting worker wit
 ```
 
-Nous allons à présent finaliser la configuration de NGINX. Cela passe par la création d'un dernier fichier :
+Nous allons enfin finaliser la configuration de NGINX. Cela passe par la création d'un dernier fichier :
 
 ```console
-$ sudo nano /etc/nginx/sites-available/gan4vis/server
+$ sudo nano /etc/nginx/sites-available/server
 ```
+
+À remplir avec le contenu suivant dans lequel vous aurez adapté le nom de domaine et l'utilisateur.
 
 ```console
 server {
@@ -399,15 +481,15 @@ server {
 }
 ```
 
-Entrer les commandes suivantes :
+Entrer ensuite les commandes suivantes :
 
 ```console
-$ sudo ln -s /etc/nginx/sites-available/gan4vis/server /etc/nginx/sites-enabled
+$ sudo ln -s /etc/nginx/sites-available/server /etc/nginx/sites-enabled
 $ sudo nginx -t
 $ sudo systemctl restart nginx
 ```
 
-Désactiver ensuite la permission du pare-feu :
+Désactiver ensuite la permission du pare-feu sur le port 5000.
 
 ```console
 $ sudo ufw delete allow 5000
@@ -450,9 +532,3 @@ $ sudo systemctl restart nginx
 ```
 
 Le serveur est alors à jour et peut être accédé normalement par URL.
-
-**DNS et Réseau**
-
-
-
-
