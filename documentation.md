@@ -7,6 +7,7 @@ Le fichier suivant détail le fonctionnement de l'application ainsi que la confi
 * Données
 * Processus
 * Travailler en local avec l'application
+* Charger un nouveau modèle
 
 [Serveur](#serveur)
 * Accès au serveur
@@ -21,6 +22,7 @@ Nous détaillons dans cette partie les aspects important de l'application. Nous 
 * **Données** : quelles sont les différentes données utilisées par l'application et en quoi elles sont utiles.
 * **Processus** : quels sont les processus importants à l'oeuvre lors de l'exécution de l'application.
 * **Travailler en local avec l'application** : comment mettre en place localement le repository GitHub de l'application
+* **Charger un nouveau modèle** : comment implémenter un nouveau modèle sur l'application
 
 ## Structure
 
@@ -178,6 +180,84 @@ $ flask db init
 $ flask db migrate -m "Database Initialization"
 $ flask db upgrade
 ```
+
+## Charger un nouveau modèle
+
+L'application fonctionne et vous souhaitez à présent ajouter un nouveau modèle de transfert de style. Pour cela, vous avez au préalable entrainé un modèle comme expliqué dans la partie Données - Modèles plus haut. À l'issue de l'entraînement vous obtenez un fichier `.pth`. Nous allons voir dans cette partie où ajouter ce fichier et comment le rendre utilisable depuis l'interface.
+
+### 1. Placer les ressources dans l'application
+
+Les ressources nécessaires à l'ajout d'un modèle sont :
+* Un modèle entraîné au format `.pth`
+* Une image de style au format `.jpg`
+* Une image d'affichage au format `.jpg`
+
+**Modèle entrainé**
+
+Le fichier `nom_modele.pth` doit être placé dans le dossier `gan4vis/server/app/gan/saved_models`. Dans `nom_modele`, les mots doivent être séparés par des `_`.
+
+**Image de style**
+
+Dans la fonction `treatment()` présente dans `gan4vis/server/app/routes.py` , l'image de style est affectée en image de font lors d'un transfert de style. Nous avons donc besoin de rendre disponible l'image de style. Pour cela sauvegarder l'image de style sous forme `nom_modele.jpg` dans le dossier `gan4vis/server/app/static/style-images`, où `nom_modele` correspond au nom du fichier `.pth` chargé plus haut, sans l'extension. 
+
+**Image d'affichage**
+
+Sur l'interface, l'image de style est présentée en choix. Une image d'affichage est pour cela nécessaire. Cette image correspond à une version carré, à qualité réduite de l'image de style. L'image d'affichage doit être placée dans `gan4vis/server/app/static/style-images` sous la forme `nom_modele.jpg`, où `nom_modele` correspond au nom du fichier `.pth` chargé plus haut, sans l'extension. 
+
+### 2. Connecter le serveur au modèle
+
+Le fichier `gan4vis/server/app/gan/neural_style.py` est le fichier chargeant les modèles et réalisant le transfert de style. Au début du script, les modèles sont chargés au démarrage du serveur. C'est là que nous avons besoin d'effectuer une modification. Ajouter au dictionaire existant une nouvelle clé correspondant au nom du fichier `.pth` avec extension. Y affecter une valeur `None` 
+
+```python
+# Create dictionary storing the models
+models = {"mosaic.pth" : None, "udnie.pth" : None, "map.pth" : None, "pollock.pth" : None, "nom_model.pth" : None}
+```
+Les deux étapes précédentes terminées, le serveur est configuré pour faire fonctionner le modèle. Nous pouvons à présent nous occuper de l'interface.
+
+### 3. Rendre le modèle utilisable depuis l'interface
+
+Au niveau de l'interface, la selection d'un modèle se fait par clic de l'utilisateur sur l'image du modèle. Il est donc nécessaire d'assurer que l'image soit bien présente et que les mécanismes associés fonctionnent.
+
+**processing_index.js**
+
+Aucun changement n'est à effectuer sur `processing_index.js`, nous expliquons ici comment est géré le modèle sur l'interface. `processing_index.js` gère les intéractions sur la page d'accueil et est en charge de l'envoi de la requête AJAX au serveur. Cette requête contient entre autres le nom du modèle à utiliser. La récupération du modèle utilisé est permise par le morceau de code suivant : 
+
+```javascript
+var image_click = function(image){
+   $('.selected').removeClass('selected'); // removes the previous selected class
+   $(image).addClass('selected'); // adds the class to the clicked image
+   image_style_selected = document.getElementsByClassName("image_style selected")[0].id
+};
+```
+
+Les deux premières lignes sont en charge de modifier l'aspect de l'image sélectionnée. La troisième va récupérer l'identifiant de l'image sélectionnée. C'est cet identifiant qui sera envoyé dans la requête AJAX. L'ajout d'un modèle se résume donc à l'ajout de code html dans `index.html`.
+
+**index.html**
+
+Le fichier `index.html` permet de gérer l'affichage de la page d'accueil. Le morceau suivant est en charge de l'affichage des modèles. Complèter comme ci-dessous un des blocks affichant un modèle. 
+
+```html
+<div id="interface_gans" style="width:35%; float: right; height:30%;margin-left:7.5%;margin-right:7.5%">
+	<table style="width:100%; table-layout: fixed">
+	<tr>
+		<td style="width: 25%">
+		<img id="mosaic.pth" src="static/utilitaries_images/mosaic.jpg" {% if dict_transfer.model=="mosaic.pth" %} class="image_style selected" {% else %} class="image_style" {% endif %} onclick="image_click(this)" width="80%">
+		</td>
+		<td style="width: 25%">
+		<img id="map.pth" src="static/utilitaries_images/map.jpg" {% if dict_transfer.model=="map.pth" %}class="image_style selected" {% else %} class="image_style" {% endif %} onclick="image_click(this)" width="80%">
+	  </td>
+		<td style="width: 25%">
+		<img id="pollock.pth" src="static/utilitaries_images/pollock.jpg" {% if dict_transfer.model=="pollock.pth" %} class="image_style selected" {% else %} class="image_style" {% endif %} onclick="image_click(this)" width="80%">
+		</td>
+		<td style="width: 25%">
+		<img id="nom_modele.pth" src="static/utilitaries_images/nom_modele.jpg" {% if dict_transfer.model=="nom_modele.pth" %} class="image_style selected" {% else %} class="image_style" {% endif %} onclick="image_click(this)" width="80%">
+		</td>
+	</tr>
+	</table>
+</div>
+```
+
+Ces étapes terminées le modèle devrait être utilisable depuis l'interface.
 
 # Serveur
 
