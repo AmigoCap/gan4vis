@@ -1,6 +1,3 @@
-// Image Style selection
-image_style_selected = transfer.model
-
 // Show the handsontable if the screen is big enough
 window.onload = function(){
   if ($(document).width()<992){
@@ -10,6 +7,18 @@ window.onload = function(){
   }
 }
 
+// If the window is to narrow remove the display of the handsontable 
+window.onresize = function(){
+  if ($(document).width()<992){
+    document.getElementById("hot").style.display = "none"
+  } else {
+  }
+}
+
+// Image Style selection
+image_style_selected = transfer.model // Get the initial model from the server
+
+// Detect the selection of models
 var image_click = function(image){
    $('.selected').removeClass('selected'); // removes the previous selected class
    $(image).addClass('selected'); // adds the class to the clicked image
@@ -52,7 +61,8 @@ var width = 450,
 var current_ratio = transfer.ratio; // Get the initial ratio from the server
 var ratios = [1,2,3,4,5,6,7,8,9,10]
 
-var gridding = d3.gridding() // Declare the grid
+// Declare the grid
+var gridding = d3.gridding()
   .size([width - 20*current_ratio, height - 20*current_ratio]) //Change the ratio depending on current_ratio
   .offset([10*current_ratio, 10*current_ratio]) //Change the ratio depending on current_ratio
   .valueHeight("__value")
@@ -61,9 +71,9 @@ var gridding = d3.gridding() // Declare the grid
 
 //Declare variables to draw
 var nb_data;
-var data; //datapoints
-var current_property = 0; //
-var current_distribution = transfer.distribution; //distribution
+var data; // datapoints
+var current_property = 0;
+var current_distribution = transfer.distribution; // distribution
 
 
 // Complete declaration with values.
@@ -92,8 +102,10 @@ if (transfer.token !== "placeholder") {
   })
 }
 
+// Declare grid modes
 var all_modes = ["horizontal", "vertical", "treemap"];
 
+// Change distribution
 var distribution_change = function() {
   current_distribution = distributions[(distributions.indexOf(current_distribution) + 1) % distributions.length];
   console.log("current distribution", current_distribution)
@@ -112,6 +124,7 @@ var distribution_change = function() {
   draw();
 }
 
+// Add a point
 var add_point = function() {
   nb_data++;
   data.push(Math.floor(d3.mean(data)))
@@ -130,6 +143,7 @@ var add_point = function() {
   draw();
 }
 
+// Remove a point
 var remove_point = function() {
   if (nb_data == 1){
   } else {
@@ -151,6 +165,7 @@ var remove_point = function() {
   }
 }
 
+// Randomize points
 var randomize = function() {
   data = generate_data(nb_data, current_distribution);
   data_handson = data.map(function(d,i){
@@ -168,7 +183,7 @@ var randomize = function() {
   draw();
 }
 
-
+// Change the grid mode
 var change_grid = function() {
   var current_mode = gridding.mode();
   gridding.mode(all_modes[(all_modes.indexOf(current_mode) + 1) % all_modes.length])
@@ -177,6 +192,7 @@ var change_grid = function() {
   current_property = 0; // then if go through properties start with 1st one
 }
 
+// Change orientation
 var change_orientation = function() {
   var o = ["up", "down"]; // , "top right"
   var new_orient = o[(o.indexOf(gridding.orient()) + 1) % o.length];
@@ -329,6 +345,7 @@ var svg = d3.select("#preview")
   .attr("viewBox", "0 0 " + width + " " + height)
   .attr("perserveAspectRatio", "xMinYMid")
 
+// Draw the chart
 function draw() {
   var griddingData = gridding(data_handson.map(a => a.value));
 
@@ -388,6 +405,7 @@ function draw() {
 
   squares.exit().remove();
 
+  // Code to display the indexes
   // var indexes = svg.selectAll(".index")
   // 	.data(griddingData, function(d, i) { return d[var_id]; });
   //
@@ -416,15 +434,15 @@ function draw() {
 // Define variable to be passed in AJAX
 var ajax_binary_image;
 
+// Remove the red fill
 function neutralize(){
-  // Remove the red fill
   var svg = d3.select("#svg_preview")
   svg.selectAll("rect")
     .style('fill', 'white')
 }
 
+// Set the red fill
 function activate(){
-  // Set the red fill
   var svg = d3.select("#svg_preview")
   svg.selectAll("rect")
     .style('fill', function(d,i){
@@ -443,8 +461,6 @@ function render_image() {
   d3.select("#render-canvas").remove();
   d3.select("#render-img").remove();
 
-  // console.log(d3.select('svg').node())
-
   // serialize our SVG XML to a string.
   var source = (new XMLSerializer()).serializeToString(d3.select('svg').node());
 
@@ -456,34 +472,10 @@ function render_image() {
   var doctype = '<?xml version="1.0" standalone="no"?>' +
     '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
 
-  // create a file blob of our SVG.
-  // var blob = new Blob([doctype + source], {
-  //   type: 'image/svg+xml;charset=utf-8'
-  // });
-  //
-  // console.log(blob)
-  //
-  // var url = window.URL.createObjectURL(blob);
-  //
-  // console.log(url)
-
-  // Put the svg into an image tag so that the Canvas element can read it in.
-  //
-  // var img = d3.select('body').append('img')
-  //   .attr('width', 400)
-  //   .attr('height', 300)
-  //   .style("display", "none")
-  //   .attr("id", "render-img")
-  //   .node();
-
-  // console.log("///",img)
-
   // Use image to store the encoded svg
   var img = new Image();
   img.src = 'data:image/svg+xml;utf8,' + doctype + source;
 
-  // console.log('data:image/svg+xml;utf8,' + doctype + source)
-  // console.log(img.src)
 
   img.addEventListener('load',function() {
     // Now that the image has loaded, put the image into a canvas element.
@@ -496,16 +488,10 @@ function render_image() {
 
     var canvasUrl = canvas.toDataURL("image/png");
 
-    // console.log(canvasUrl)
-
-    // this is now the base64 encoded version of our PNG! you could optionally
-    // redirect the user to download the PNG by sending them to the url with
-    // `window.location.href= canvasUrl`.
-    // img2.src = canvasUrl;
-    ajax_binary_image = canvasUrl
+    ajax_binary_image = canvasUrl // Image to be sent to the server through AJAX
   })
 
-  activate() //restore the red fill
+  activate() // Restore the red fill
 }
 
 draw();
@@ -598,10 +584,3 @@ d3.select("body").append("button").on("click", function() {
   current_layout = layouts[(layouts.indexOf(current_layout) + 1) % layouts.length];
   draw()
 });
-
-window.onresize = function(){
-  if ($(document).width()<992){
-    document.getElementById("hot").style.display = "none"
-  } else {
-  }
-}

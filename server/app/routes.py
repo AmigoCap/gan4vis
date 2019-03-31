@@ -26,19 +26,18 @@ from neural_style import *
 def root_page():
     return redirect(url_for('index'))
 
-
-# Defining the homepage view
+# Defining the homepage view and setting up the default config for style transfert
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     token = request.args.get('token')
     app.logger.info("index token={}".format(token))
     dict_transfer = {"token":"placeholder","model":"mosaic.pth","distribution":"random","datapoints":"","grid":"vertical","orientation":"up","ratio":2} # Start ratio at 2 to be able to activate both zooms on page load
-    if token:
+    if token: # If a token is given in the connection page, load the associated style transfer parameters
         transfer = Transfer.query.filter_by(token=token).first()
         dict_transfer = {"token":transfer.token,"model":transfer.model,"distribution":transfer.distribution,"datapoints":transfer.datapoints,"grid":transfer.grid,"orientation":transfer.orientation,"ratio":transfer.ratio}
     return render_template('index.html', title='GAN4VIS', dict_transfer=dict_transfer)
 
-
+# Function triggered when button "Apply Style" is clicked
 @app.route('/treatment', methods=['GET','POST'])
 def treatment():
     token = str(uuid.uuid4())
@@ -53,6 +52,7 @@ def treatment():
     ratio = dictionary_request["ratio"]
 
     ### 2 - Prepare the input image
+
     app.logger.info("treatment token={} : IMAGE-INPUT START".format(token))
     t_image_input_start = time.time()
 
@@ -64,7 +64,7 @@ def treatment():
     png = Image.open(dataBytesIO)
 
     # Work on background and remove the Alpha Channel
-    background = Image.open('./app/static/style-images/'+re.sub('_','-',re.sub('.pth','.jpg',model))) # Use the style image as background
+    background = Image.open('./app/static/style-images/'+re.sub('.pth','.jpg',model)) # Use the style image as background
     #background = Image.open('./app/static/style-images/'+"white-noise.jpg") # Use white noise as background
     background = background.resize((450,300),Image.ANTIALIAS) # Resize the background
     #background = background.filter(ImageFilter.FIND_EDGES) # Detect background edges
@@ -107,10 +107,12 @@ def treatment():
     # Return the content of the output to the client with AJAX
     return(token)
 
+# Route displaying the process page
 @app.route('/process')
 def process():
     return render_template('process.html', title='GAN4VIS - Process')
 
+# Route displaying the dashboard page
 @app.route('/dashboard')
 def dashboard():
     transfers = []
@@ -122,11 +124,11 @@ def dashboard():
 def preview(token):
     return send_file("./static/output_images/{}.jpg".format(token), mimetype='image/jpg')
 
-
+# Route used when a transition is called
 @app.route('/treatment_transitions', methods=['GET','POST'])
 def treatment_transitions():
     token = str(uuid.uuid4())
-    
+
     ### 1 - Get the AJAX request and create the variable storing the data and the one storing the binary
     dictionary_request = request.get_json()
     bin_image = dictionary_request["image"]
@@ -134,17 +136,17 @@ def treatment_transitions():
     ### 2 - Prepare the input image
     app.logger.info("transition_creation token={} : IMAGE-INPUT START".format(token))
     t_image_input_start = time.time()
-    
+
     # A2B : Transform the image into binaries
     binary_data = a2b_base64(dictionary_request['image'].split('base64,')[1])
 
     # Transform binary data to PIL format (Step could be avoided if we find something like "Image.froma")
     dataBytesIO = BytesIO(binary_data)
     png = Image.open(dataBytesIO)
-    
+
     t_image_input = time.time() - t_image_input_start
     app.logger.info("transition_creation token={} : IMAGE-INPUT END ({}s)".format(token,t_image_input))
-    
+
     ### 3 - Run the style transfer using the GAN chosen in model
 
     app.logger.info("transition_creation token={} : GENERATION START".format(token))
@@ -160,7 +162,7 @@ def treatment_transitions():
     transition_dict['end_path'] = os.path.join(os.path.dirname(__file__),
                                                  'static', 'utilitaries_images',
                                                  'transition_end.jpg')
-    
+
     transition_dict['user_canvas'] = png_wo_alpha
 
     transition_result = interpol(transition_dict) # TODO: Call Wills' function
@@ -179,10 +181,11 @@ def treatment_transitions():
 
     t_image_output = t_image_output_start - time.time()
     app.logger.info("treatment token={} : IMAGE-OUTPUT END ({}s)".format(token,t_image_output))
-    
+
     # Return the content of the output to the client with AJAX
     return(token)
-    
+
+# Route displaying the interface for transitions
 @app.route('/transitions')
 def transition():
     token = request.args.get('token')

@@ -17,7 +17,7 @@ from transformer_net import TransformerNet
 from vgg import Vgg16
 
 # Create dictionary storing the models
-models = {"mosaic.pth" : None, "rain_princess.pth" : None, "candy.pth" : None, "udnie.pth" : None, "map.pth" : None, "pollock.pth" : None}
+models = {"mosaic.pth" : None, "udnie.pth" : None, "map.pth" : None, "pollock.pth" : None, "nom_modele.pth" : None}
 # Import and prepare the models
 for model_name in models.keys():
     with torch.no_grad():
