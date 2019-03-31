@@ -1,6 +1,6 @@
 # Documentation
 
-Le fichier suivant détail le fonctionnement de l'application ainsi que la configuration du serveur Digital Ocean, à l'issue du mois de mars 2019. Voici la structure de la documentation :
+Le fichier suivant détaille le fonctionnement de l'application ainsi que la configuration du serveur Digital Ocean à l'issue du mois de mars 2019. Voici la structure de la documentation :
 
 [Application](#application)
 * Structure
@@ -17,12 +17,12 @@ Le fichier suivant détail le fonctionnement de l'application ainsi que la confi
 
 # Application
 
-Nous détaillons dans cette partie les aspects important de l'application. Nous évoquons ainsi :
+Nous détaillons dans cette partie les aspects importants de l'application. Nous évoquons ainsi :
 * **Structure** : quelles sont les pièces de l'application et comment elles intéragissent en elles.
 * **Données** : quelles sont les différentes données utilisées par l'application et en quoi elles sont utiles.
 * **Processus** : quels sont les processus importants à l'oeuvre lors de l'exécution de l'application.
-* **Travailler en local avec l'application** : comment mettre en place localement le repository GitHub de l'application
-* **Charger un nouveau modèle** : comment implémenter un nouveau modèle sur l'application
+* **Travailler en local avec l'application** : comment mettre en place localement le repository GitHub de l'application.
+* **Charger un nouveau modèle** : comment implémenter un nouveau modèle sur l'application.
 
 ## Structure
 
@@ -31,7 +31,7 @@ Le [site](https://gan4vis.net) actuel est constitué de quatre pages web.
 * [/index](https://gan4vis.net/index) : accueil accessible à [https://gan4vis.net](https://gan4vis.net) permettant d'effectuer le transfert de style.
 * [/process](https://gan4vis.net/process) : page accessible depuis l'accueil détaillant le processus de création de la plateforme
 * [/dashboard](https://gan4vis.net/dashboard) : page non accessible depuis l'accueil, uniquement accessible à [https://gan4vis.net/dashboard](https://gan4vis.net/dashboard) présentant un tableau de bord d'utilisation de la fonctionnalité transfert de style.
-* [/transitions]() : page seulement accessible à 
+* [/transitions](https://gan4vis.net/transitions) : page accessible à [https://gan4vis.net/transitions](https://gan4vis.net/transitions)
 
 L'application permettant de gérer ce site a une structure MVT (Model View Template). Elle fait appel à un ensemble de fichiers statiques ainsi qu'une base de donnée SQLite. Ci-dessous un schéma de l'architecture de l'application :
 
@@ -47,15 +47,15 @@ Les données manipulées par l'application sont de trois formes, modèles, image
 
 ### Modèles
 
-Les modèles sont des fichiers .pth stockés dans le dossier gan4vis/server/app/gan/saved_models/. Nous pouvons générer les modèles pour l'application de transfert de style comme pour celle de transitions. Pour entrainer un modèle il suffit de suivre la procédure expliquée sur page de [fast-neural-style](https://github.com/pytorch/examples/tree/master/fast_neural_style "GitHub de fast-neural-style") qui est l'implémentation en pytorch que nous avons utilisé.
+Les modèles sont des fichiers `.pth` stockés dans le dossier `gan4vis/server/app/gan/saved_models`. Nous pouvons générer les modèles pour l'application de transfert de style comme pour celle de transitions. Pour entrainer un modèle de transfert de style il suffit de suivre la procédure expliquée sur page de [fast-neural-style](https://github.com/pytorch/examples/tree/master/fast_neural_style "GitHub de fast-neural-style") qui est l'implémentation en pytorch que nous avons utilisée.
 
 ### Images
 
-Les images stockées sur le serveur correspondent aux images générées lors de chaque transfer de style ainsi que les images utiles dans les affichages divers. Toutes les images se trouve dans les sous dossiers de gan4vis/server/app/static.
+Les images stockées sur le serveur correspondent aux images générées lors de chaque transfer de style ainsi que les images utiles dans les affichages divers. Toutes les images se trouve dans les sous dossiers de `gan4vis/server/app/static`.
 
 ### Base SQLite
 
-Nous avons opté pour une base SQLite pour enregistrée les configurations des transferts de style réalisés. Cette base correspond au fichier gan4vis/server/app.db. Elle est constituée d'une unique table appelée transfer. Nous avons fait le choix d'utiliser [SQLAlchemy](https://www.sqlalchemy.org/) pour travailler avec la base dans notre application. La structure de la base est reliée au fichier "models.py". Celui-ci defini une class appelée "Transfer" qui correspond à la table de la base. Les colonnes de cette table correspondent aux aspects des transferts de style dont nous souhaitons garder la trace. Ci-dessous un exemple d'entrée de la table.
+Nous avons opté pour une base SQLite pour enregistrer les configurations des transferts de style réalisés. Cette base correspond au fichier `gan4vis/server/app.db`. Elle est constituée d'une unique table appelée transfer. Nous avons fait le choix d'utiliser [SQLAlchemy](https://www.sqlalchemy.org/) pour travailler avec la base dans notre application. La structure de la base est reliée au fichier "models.py". Celui-ci definit une classe appelée "Transfer" qui correspond à la table de la base. Les colonnes de cette table correspondent aux aspects des transferts de style dont nous souhaitons garder la trace. Ci-dessous un exemple d'entrée de la table.
 
 <p align="center">
 <img src="server/app/static/utilitaries_images/database.png" width="100%">
@@ -109,7 +109,7 @@ Nous allons à présent détailler le processus à l'oeuvre lors de l'utilisatio
   </tr>
   <tr>
     <td>4</td>
-    <td>Transfert. Une fonction "treatment" présente dans le fichier "routes.py" est alors en charge du transfert de style, un token est défini correspondant à l'opération. La fonction appelle une fonction présente dans "neural_style.py" qui sauvegarde l'image de sortie en la nommant à l'aide du token. 
+    <td>Une fonction "treatment" présente dans le fichier "routes.py" est alors en charge du transfert de style, un token est défini correspondant à l'opération. La fonction appelle une fonction présente dans "neural_style.py" qui sauvegarde l'image de sortie en la nommant à l'aide du token. 
     <td>-</td>
   </tr>
   <tr>
@@ -129,7 +129,7 @@ Un système de dashboard a été mis en place afin de rendre compte de l'utilisa
 
 ### Partage d'URL
 
-Nous avons souhaité pourvoir partager notre application de transfert de style par URL. Le but étant qu'après avoir généré un transfert, je puisse le partager à quelqu'un qui rechargerait la page à son tour avec toutes les données d'entrée et sortie de l'image initiale. La route "index" est le coeur du processus qui permet cela
+Nous avons souhaité pourvoir partager notre application de transfert de style par URL. Le but étant qu'après avoir généré un transfert, l'utilisateur puisse le partager à quelqu'un qui rechargerait la page à son tour avec toutes les données d'entrée et sortie de l'image initiale. La route "index" est le coeur du processus qui permet cela
 
 ```python
 @app.route('/index', methods=['GET', 'POST'])
@@ -143,7 +143,7 @@ def index():
     return render_template('index.html', title='GAN4VIS', dict_transfer=dict_transfer)
 ```
 
-Cette route est la fonction déclenchée sur le serveur à chaque fois qu'un utilisateur se rend sur l'URL https://gan4vis.net/index. Bien qu'aucun argument ne soit présent dans la route, la fonction reçoit en réalité systématiquement une information du client. En effet, la ligne : `token = request.args.get('token')` va rechercher une information de l'URL du client du type "y a-t-il un argument "token dans l'URL ?". Ainsi :
+Cette route est la fonction déclenchée sur le serveur à chaque fois qu'un utilisateur se rend sur l'URL https://gan4vis.net/index. Bien qu'aucun argument ne soit présent dans la route `()`, la fonction reçoit en réalité systématiquement une information du client. En effet, la ligne : `token = request.args.get('token')` va rechercher une information de l'URL du client du type "y a-t-il un argument "token" dans l'URL ?". Ainsi :
 
 * https://gan4vis.net/index : token = None
 * https://gan4vis.net/index?token=558af5eb-db76-4f7f-b500-536d123f3b30 : token = 558af5eb-db76-4f7f-b500-536d123f3b30
@@ -157,23 +157,23 @@ Pour travailler en local avec l'application, il suffit de cloner le respository 
 ```console
 $ git clone https://github.com/AmigoCap/gan4vis.git
 ```
-Avant de lancer l'application trois points doivent être configurés. En effet, une base de données sqlite et les fichiers de logs doivent être configurés.
+Avant de lancer l'application trois points doivent être configurés. En effet, la base de données SQLite et les fichiers de logs doivent être configurés.
 
-Tout d'abord installer les requirements nécessaires liés au fichiers gan4vis/server/requirements.txt.
+Tout d'abord installer les requirements nécessaires liés au fichiers `gan4vis/server/requirements.txt`.
 
 ```console
 $ pip install -r requirements.txt
 ```
 
-Par expérience l'installation de PyTorch peut être délicate. Installer donc PyTorch manuellement. La manière de procéder la plus simple semble être d'aller sur [le site de PyTorch](https://pytorch.org/) et de déterminer la commande pip en fonction de la configuration de la machine. La version de PyTorch sans CUDA peut être utilisée.
+Par expérience l'installation de PyTorch peut être délicate. Installer donc PyTorch manuellement. La manière de procéder la plus simple semble encre être d'aller sur [le site de PyTorch](https://pytorch.org/) et de déterminer la commande pip en fonction de la configuration de la machine. La version de PyTorch sans CUDA peut être utilisée.
 
-Configurer ensuite les logs en créant le fichier qui les stockera :
+Configurer ensuite les logs en créant un fichier qui les stockera. Ce dossier se trouve dans `gan4vis/server`.
 
 ```console
 $ mkdir logs
 ```
 
-Pour configurer la base de données, entrer les commandes suivantes :
+Dans le dossier `gan4vis/server`, configurons la base de données. Entrer les commandes suivantes :
 
 ```console
 $ flask db init
@@ -183,9 +183,9 @@ $ flask db upgrade
 
 ## Charger un nouveau modèle
 
-L'application fonctionne et vous souhaitez à présent ajouter un nouveau modèle de transfert de style. Pour cela, vous avez au préalable entrainé un modèle comme expliqué dans la partie Données - Modèles plus haut. À l'issue de l'entraînement vous obtenez un fichier `.pth`. Nous allons voir dans cette partie où ajouter ce fichier et comment le rendre utilisable depuis l'interface.
+Nous supposons à présent que l'application fonctionne et que vous souhaitez à ajouter un nouveau modèle de transfert de style. Pour cela, vous avez au préalable entrainé un modèle comme expliqué dans la partie Données - Modèles plus haut. À l'issue de l'entraînement vous obtenez un fichier `.pth`. Nous allons voir dans cette partie où ajouter ce fichier et comment le rendre utilisable depuis l'interface.
 
-### 1. Placer les ressources dans l'application
+### 1. Placer les ressources nécessaires dans l'application
 
 Les ressources nécessaires à l'ajout d'un modèle sont :
 * Un modèle entraîné au format `.pth`
@@ -202,15 +202,15 @@ Dans la fonction `treatment()` présente dans `gan4vis/server/app/routes.py` , l
 
 **Image d'affichage**
 
-Sur l'interface, l'image de style est présentée en choix. Une image d'affichage est pour cela nécessaire. Cette image correspond à une version carré, à qualité réduite de l'image de style. L'image d'affichage doit être placée dans `gan4vis/server/app/static/style-images` sous la forme `nom_modele.jpg`, où `nom_modele` correspond au nom du fichier `.pth` chargé plus haut, sans l'extension. 
+Sur l'interface, l'image de style est présentée en choix. Une image d'affichage est pour cela nécessaire. Cette image correspond à une version carré, à qualité réduite de l'image de style. L'image d'affichage doit être placée dans `gan4vis/server/app/static/utilitaries_images` sous la forme `nom_modele.jpg`, où `nom_modele` correspond au nom du fichier `.pth` chargé plus haut, sans l'extension. 
 
 ### 2. Connecter le serveur au modèle
 
-Le fichier `gan4vis/server/app/gan/neural_style.py` est le fichier chargeant les modèles et réalisant le transfert de style. Au début du script, les modèles sont chargés au démarrage du serveur. C'est là que nous avons besoin d'effectuer une modification. Ajouter au dictionaire existant une nouvelle clé correspondant au nom du fichier `.pth` avec extension. Y affecter une valeur `None` 
+Le fichier `gan4vis/server/app/gan/neural_style.py` est le fichier chargeant les modèles et réalisant le transfert de style. Au début du script, les modèles sont chargés au démarrage du serveur. C'est là que nous avons besoin d'effectuer une modification. Ajouter au dictionnaire existant une nouvelle clé correspondant au nom du fichier `.pth` avec extension. Y affecter une valeur `None` 
 
 ```python
 # Create dictionary storing the models
-models = {"mosaic.pth" : None, "udnie.pth" : None, "map.pth" : None, "pollock.pth" : None, "nom_model.pth" : None}
+models = {"mosaic.pth" : None, "udnie.pth" : None, "map.pth" : None, "pollock.pth" : None, "nom_modele.pth" : None}
 ```
 Les deux étapes précédentes terminées, le serveur est configuré pour faire fonctionner le modèle. Nous pouvons à présent nous occuper de l'interface.
 
@@ -220,7 +220,7 @@ Au niveau de l'interface, la selection d'un modèle se fait par clic de l'utilis
 
 **processing_index.js**
 
-Aucun changement n'est à effectuer sur `processing_index.js`, nous expliquons ici comment est géré le modèle sur l'interface. `processing_index.js` gère les intéractions sur la page d'accueil et est en charge de l'envoi de la requête AJAX au serveur. Cette requête contient entre autres le nom du modèle à utiliser. La récupération du modèle utilisé est permise par le morceau de code suivant : 
+Aucun changement n'est à effectuer sur `processing_index.js`, nous expliquons juste ici comment est géré un modèle sur l'interface. `processing_index.js` gère les intéractions sur la page d'accueil et est en charge de l'envoi de la requête AJAX au serveur. Cette requête contient entre autres le nom du modèle à utiliser. La récupération du modèle utilisé est permise par le morceau de code suivant : 
 
 ```javascript
 var image_click = function(image){
@@ -230,7 +230,7 @@ var image_click = function(image){
 };
 ```
 
-Les deux premières lignes sont en charge de modifier l'aspect de l'image sélectionnée. La troisième va récupérer l'identifiant de l'image sélectionnée. C'est cet identifiant qui sera envoyé dans la requête AJAX. L'ajout d'un modèle se résume donc à l'ajout de code html dans `index.html`.
+Les deux premières lignes sont en charge de modifier l'aspect de l'image sélectionnée. La troisième va récupérer l'identifiant de l'image sélectionnée. C'est cet identifiant qui sera envoyé dans la requête AJAX. L'ajout d'un modèle se résume donc à l'ajout du code html dans `index.html` traité par cette dernière ligne.
 
 **index.html**
 
@@ -271,7 +271,7 @@ Nous détaillons dans cette partie les aspects important de la gestion et de la 
 * **Accès au serveur** : comment se connecter en SSH et créer de nouveaux utilisateurs ayant des droits administrateurs.
 * **NGINX** : comment et configurer le serveur web qui constitue la base de l'application
 * **Python, Gunicorn & Flask** : comment configurer Gunicorn et Flask au dessus de NGINX pour finaliser le déploiement de l'application
-* **Mise à jour de l'application** : comment mettre à jour l'application au fil de l'évolution du présent repo GitHub.
+* **Mise à jour de l'application** : comment mettre à jour l'application au fil de l'évolution du présent repository GitHub.
 
 ## Accès au serveur
 
@@ -279,7 +279,7 @@ Les ressources nécessaires à la création d'un utilisateur et à l'administrat
 * [Initial Server Setup with Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04)
 * [How to Set Up SSH Keys on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804)
 
-L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons ci-dessous succintement les étapes nécessaires à la création d'un nouvel utilisateur. Il est conseillé de faire les étapes suivantes en root. 
+L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent pas correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons ci-dessous succintement les étapes nécessaires à la création d'un nouvel utilisateur. Il est conseillé de faire les étapes suivantes en root. 
 
 ### 0. Activer le firewall
 
@@ -298,7 +298,7 @@ Créons à présent l'utilisateur.
 # adduser utilisateur
 ```
 
-Entrez alors les informations requises ainsi que son mot de passe. 
+Entrer alors les informations requises ainsi que son mot de passe. 
 
 ### 2. Donner l'accès root à l'utilisateur
 
@@ -324,7 +324,7 @@ La configuration se fait automatiquement sur demande de l'utilisateur. Il lui su
 $ ssh-copy-id utilisateur@ip-server
 ```
 
-Une fois l'opération terminée, l'utilisateur pourra se connecter normalement au serveur en ssh. Si la commande ssh-copy-id ne fonctionne pas, cela signifie que votre système ne la supporte pas, reportez-vous alors à [How to Set Up SSH Keys on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804).
+Une fois l'opération terminée, l'utilisateur pourra se connecter normalement au serveur en SSH. Si la commande ssh-copy-id ne fonctionne pas, cela signifie que son système ne la supporte pas, reportez-vous alors à [How to Set Up SSH Keys on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804).
 
 ## NGINX
 
@@ -333,7 +333,7 @@ Maintenant qu'un utilisateur tout puissant est configuré, nous allons pouvoir c
 Les ressources utilisées sont disponibles ici :
 * [How To Install Nginx on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04)
 
-[NGINX](https://fr.wikipedia.org/wiki/NGINX) est la première couche sur laquelle est assise l'application. NGINX permet entre autres la gestion des requêtes. Nous détaillons ci-dessous les étapes nécessaire au paramétrage de NGINX sur une machine Ubuntu 18.04.1. 
+[NGINX](https://fr.wikipedia.org/wiki/NGINX) est la première couche sur laquelle est assise l'application. NGINX permet entre autres la gestion des requêtes. Nous détaillons ci-dessous les étapes nécessaires au paramétrage de NGINX sur une machine Ubuntu 18.04.1. 
 
 En pré-requis de cette étape, nous considérons que :
 *Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
@@ -445,7 +445,7 @@ $ git clone https://github.com/AmigoCap/gan4vis.git
 
 ### 3. Initialiser un environnement virtuel
 
-Comme notre serveur ne se trouve pas directement à la racine du repository GitHub. Déplaçons-nous donc maintenant dans le dossier de l'application pour réaliser les étapes suivantes.
+Comme notre serveur ne se trouve pas directement à la racine du repository GitHub, déplaçons-nous dans le dossier de l'application pour réaliser les étapes suivantes.
 
 ```console
 $ cd gan4vis/server
@@ -469,7 +469,7 @@ Une fois l'environnement créé, nous allons l'activer en le définissant comme 
 $ source gan4vis_env/bin/activate
 ```
 
-La commande précédente doit avoir modifier votre console qui commence désormais par : `(gan4vis_env)`.
+La commande précédente doit avoir modifié votre console qui commence désormais par : `(gan4vis_env)`.
 
 Commençons à installer les modules. Tout d'abord, installer wheel.
 
@@ -483,13 +483,13 @@ Installer ensuite l'ensemble des modules utilisés par l'application. Pour cela 
 $ pip install -r requirements.txt
 ```
 
-Par expérience l'installation de PyTorch peut être délicate. Nous décidons donc d'installer PyTorch manuellement. La manière de procéder la plus simple semble être d'aller sur [le site de PyTorch](https://pytorch.org/) et de déterminer la commande pip en fonction de la configuration de la machine. La version de PyTorch sans CUDA peut être utilisée. Dans notre cas :
+Par expérience l'installation de PyTorch peut être délicate. Nous décidons donc d'installer PyTorch manuellement. La manière de procéder la plus simple semble encore être d'aller sur [le site de PyTorch](https://pytorch.org/) et de déterminer la commande pip en fonction de la configuration de la machine. La version de PyTorch sans CUDA peut être utilisée. Dans notre cas :
 
 <p align="center">
 <img src="server/app/static/utilitaries_images/configuration_pytorch.png" width="80%">
 </p>
 
-Nous installons donc de la manière suivante, d'après les informations fournies par le site de PyTorch : 
+Nous installons donc PyTorch de la manière suivante, d'après les informations fournies par le site de PyTorch : 
 
 ```console
 $ pip install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp36-cp36m-linux_x86_64.whl
@@ -500,14 +500,13 @@ $ pip install torchvision
 
 Nous devons maintenant terminer de configurer l'application. En effet, les modules sont installés mais l'application téléchargée depuis GitHub ne peut tourner. En effet, nous avons fait le choix de ne pas stocker sur GitHub notre base de données ainsi que nos logs. Nous avons donc besoin d'initialiser ces deux points.
 
-Pour configurer les logs, créer le fichier qui les stockera :
-
+Configurer ensuite les logs en créant un fichier qui les stockera. Ce dossier se trouve dans `gan4vis/server`.
 
 ```console
 $ mkdir logs
 ```
 
-Pour configurer la base de données, entrer les commandes suivantes :
+Dans le dossier `gan4vis/server`, configurons la base de données. Entrer les commandes suivantes :
 
 ```console
 $ flask db init
@@ -535,7 +534,7 @@ L'URL doit permettre d'accéder à l'application http://ip-serveur:5000. Si tout
 $ deactivate
 ```
 
-Nous allons maintenant configurer l'ensemble des fichiers nécessaires à la fin du déploiemen. Créons un premier fichier `server.service`. Pour cela, entrer la commande suivante :
+Nous allons maintenant configurer l'ensemble des fichiers nécessaires à la fin du déploiement. Créons un premier fichier `server.service`. Pour cela, entrer la commande suivante :
 
 ```console
 $ sudo nano /etc/systemd/system/server.service
@@ -634,7 +633,7 @@ Si votre DNS est configuré, vous devriez pouvoir accéder au site avec à http:
 
 ### 6. Passer en HTTPS
 
-Il est possible d'obtenir un "Self-signed SSL Certificate for Nginx in Ubuntu 18.04" d'après la ressource Digital Ocean. Nous présentons ici succintement les commandes qui le permettent.
+Il est possible d'obtenir un "Self-signed SSL Certificate for Nginx in Ubuntu 18.04" d'après la ressource Digital Ocean. Nous présentons ici succinctement les commandes qui le permettent.
 
 ```console
 $ sudo add-apt-repository ppa:certbot/certbot
@@ -647,7 +646,7 @@ La commande suivante demandera de renseigner une addresse électronique et d'acc
 $ sudo certbot --nginx -d gan4vis.net -d www.gan4vis.net
 ```
 
-Terminer en mettant à jour le firewall :
+Terminer en mettant à jour le pare-feu :
 
 ```console
 sudo ufw delete allow 'Nginx HTTP'
@@ -657,7 +656,7 @@ L'application doit alors pouvoir être accédée.
 
 ## Mise à jour de l'application
 
-Le serveur utilise la version de l'application présente sur GitHub. Le serveur tourne à partir de la branche master. Voici les étapes nécessaires à la mise à jour du serveur à la suite d'une modification sur GitHub.
+Le serveur utilise la version de l'application présente sur GitHub. Le serveur tourne à partir de la branche master. Voici les étapes nécessaires à la mise à jour du serveur à la suite d'une modification du repository GitHub.
 
 ### 1. Se connecter en SSH en tant qu'utilisateur au serveur 
 
