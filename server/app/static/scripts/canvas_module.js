@@ -88,8 +88,8 @@ $("#create_transition_button").on("touchstart click",function() {
     success: function(response) {
       document.getElementById("spinning_wheel").style.visibility = "hidden";
       document.getElementById("download_button").style.visibility = "visible" //show the download option
-      $("#result_image").attr("src", "static/output_images/" + response + ".gif") //Update the result image
-      document.getElementById('download_link').setAttribute("href","static/output_images/" + response + ".jpg") //Update the download target
+      $("#result_image").attr("src", "static/transition_files/output_gifs/" + response + ".gif") //Update the result image
+      document.getElementById('download_link').setAttribute("href","static/transition_files/output_gifs/" + response + ".gif") //Update the download target
       history.pushState(window.location.href, "index", "?token=" + response)
     }
   })

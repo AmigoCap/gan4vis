@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request, send_file
 from app import app, db
-from app.models import Transfer
+from app.models import Transfer, Transition
 from .gan.transition import interpol
 from binascii import a2b_base64, b2a_base64
 import re
@@ -127,11 +127,18 @@ def preview(token):
 # Route used when a transition is called
 @app.route('/treatment_transitions', methods=['GET','POST'])
 def treatment_transitions():
+
+    # Initializing variables for starting and ending images
+    # Those images are in the static `utilitaries_images`. If new transitions extremeties
+    # are to be used, just insert them in that folder with a new name and sets the following
+    # variables to the chosen name
+    start_img = 'transition_begin'
+    end_img = 'transition_end'
+
     token = str(uuid.uuid4())
 
     ### 1 - Get the AJAX request and create the variable storing the data and the one storing the binary
     dictionary_request = request.get_json()
-    bin_image = dictionary_request["image"]
 
     ### 2 - Prepare the input image
     app.logger.info("transition_creation token={} : IMAGE-INPUT START".format(token))
@@ -147,7 +154,7 @@ def treatment_transitions():
     t_image_input = time.time() - t_image_input_start
     app.logger.info("transition_creation token={} : IMAGE-INPUT END ({}s)".format(token,t_image_input))
 
-    ### 3 - Run the style transfer using the GAN chosen in model
+    ### 3 - Run the interpolation function with the user input sketch
 
     app.logger.info("transition_creation token={} : GENERATION START".format(token))
     t_creation_start = time.time()
@@ -155,13 +162,17 @@ def treatment_transitions():
     png_wo_alpha = Image.new("RGB", png.size, (255, 255, 255))
     png_wo_alpha.paste(png, mask=png.split()[3])
 
+    # Saving the sketch with another UUID token
+    sketch_token = str(uuid.uuid4())
+    png_wo_alpha.save("./app/static/transition_files/input_sketches/{}.png".format(sketch_token))
+
     transition_dict = {}
     transition_dict['begin_path'] = os.path.join(os.path.dirname(__file__),
                                                  'static', 'utilitaries_images',
-                                                 'transition_begin.jpg')
+                                                 start_img + '.jpg')
     transition_dict['end_path'] = os.path.join(os.path.dirname(__file__),
                                                  'static', 'utilitaries_images',
-                                                 'transition_end.jpg')
+                                                 end_img + '.jpg')
 
     transition_dict['user_canvas'] = png_wo_alpha
 
@@ -175,12 +186,16 @@ def treatment_transitions():
     app.logger.info("treatment token={} : IMAGE-OUTPUT START".format(token))
     t_image_output_start = time.time()
 
-    transition_result[0].save("./app/static/output_images/{}.gif".format(token),
+    transition_result[0].save("./app/static/transition_files/output_gifs/{}.gif".format(token),
                             format='GIF', save_all=True, append_images=transition_result[1:],
                             duration=1, loop=10)
 
     t_image_output = t_image_output_start - time.time()
     app.logger.info("treatment token={} : IMAGE-OUTPUT END ({}s)".format(token,t_image_output))
+    
+    t = Transition(token = token, sketch = sketch_token, begin_img = start_img, end_img = end_img)
+    db.session.add(t)
+    db.session.commit()
 
     # Return the content of the output to the client with AJAX
     return(token)
@@ -190,5 +205,8 @@ def treatment_transitions():
 def transition():
     token = request.args.get('token')
     app.logger.info("index token={}".format(token))
-    dict_transfer = {"token":"placeholder_sq"}
-    return render_template('transitions.html', title='GAN4VIS - Transitions', dict_transfer=dict_transfer)
+    dict_transition = {"token":"placeholder_sq",  "begin_img": "transition_begin", "end_img": "transition_end"}
+    if token: # If a token is given in the connection page, load the associated style transfer parameters
+        transition = Transition.query.filter_by(token=token).first()
+        dict_transition = {"token": transition.token, "begin_img": transition.begin_img, "end_img": transition.end_img, "sketch": transition.sketch}
+    return render_template('transitions.html', title='GAN4VIS - Transitions', dict_transition=dict_transition)

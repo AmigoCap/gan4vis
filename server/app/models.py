@@ -14,3 +14,13 @@ class Transfer(db.Model):
 
 	def __repr__(self):
 		return '<Tranfert {}>'.format(self.token)
+
+class Transition(db.Model):
+	token = db.Column(db.String(120), primary_key=True)
+	date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+	sketch = db.Column(db.String(120), index=True)
+	begin_img = db.Column(db.String(64), index=True)
+	end_img = db.Column(db.String(64), index=True)
+
+	def __repr__(self):
+		return '<Transition {}>'.format(self.token)
