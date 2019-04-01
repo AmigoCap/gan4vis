@@ -55,13 +55,17 @@ Les images stockées sur le serveur correspondent aux images générées lors de
 
 ### Base SQLite
 
-Nous avons opté pour une base SQLite pour enregistrer les configurations des transferts de style réalisés. Cette base correspond au fichier `gan4vis/server/app.db`. Elle est constituée d'une unique table appelée transfer. Nous avons fait le choix d'utiliser [SQLAlchemy](https://www.sqlalchemy.org/) pour travailler avec la base dans notre application. La structure de la base est reliée au fichier "models.py". Celui-ci definit une classe appelée "Transfer" qui correspond à la table de la base. Les colonnes de cette table correspondent aux aspects des transferts de style dont nous souhaitons garder la trace. Ci-dessous un exemple d'entrée de la table.
+Nous avons opté pour une base SQLite pour enregistrer les configurations des transferts de style réalisés. Cette base correspond au fichier `gan4vis/server/app.db`. Elle est constituée de deux tables, `transfer` et `transition`. Nous avons fait le choix d'utiliser [SQLAlchemy](https://www.sqlalchemy.org/) pour travailler avec la base dans notre application. La structure de la base est reliée au fichier "models.py". Celui-ci definit deux classes appelées "Transfer" et "Transition" qui correspondent aux deux tables de même noms.
+
+#### Table `transfer`
+
+Les colonnes de cette table correspondent aux aspects des transferts de style dont nous souhaitons garder la trace. Ci-dessous un exemple d'entrée de la table.
 
 <p align="center">
 <img src="server/app/static/utilitaries_images/database.png" width="100%">
 </p>
 
-* **token** : identifiant unique généré automatiquement correspondant à un transfert de style. Cet identifiant permet de nommer l'image et est intégré à l'URL afin de pouvoir partager et recharger un transfert de style. Ce point sera détaillé plus bas.
+* **token** : identifiant unique généré automatiquement correspondant à un transfert de style. Cet identifiant permet de nommer l'image et est intégré à l'URL afin de pouvoir partager et recharger un transfert de style. Ce point sera détaillé plus bas. Bien que la génération du token soit basée sur la même méthode que pour l'autre table (Universally Unique IDentifier, UUID) la probabilité de collision de la méthode est tellement faible que l'on peut considérer que chaque token est unique.
 * **date** : date du transfert de style.
 * **model** : modèle utilisé
 * **distribution** : distribution utilisée
@@ -69,6 +73,21 @@ Nous avons opté pour une base SQLite pour enregistrer les configurations des tr
 * **grid** : type de grille utilisé
 * **orientation** : orientation de la figure
 * **ratio** : niveau de zoom décidé par l'utilisateur
+
+#### Table `transition`
+
+Les colonnes de cette table permettent également de garder une trace de toutes les transitions générées afin de pouvoir faciliter la reproduction de résultat (attention cependant, il ne sera pas possible de réitérer exactement deux fois la même transition à partir d'un même graphe car le module fait appel en grande partie à de l'aléatoire non <em>seedé</em>.Ci-dessous un exemple d'une ligne de la table.
+
+
+<p align="center">
+<img src="server/app/static/utilitaries_images/database_transition.png" width="100%">
+</p>
+
+* **token** : Identifiant unique généré automatiquement associé à une transition. Cet identifiant permet de nommer l'image et est intégré à l'URL afin de pouvoir partager et recherger un transfert de style. Bien que la génération du token soit basée sur la même méthode que pour l'autre table (Universally Unique IDentifier, UUID) la probabilité de collision de la méthode est tellement faible que l'on peut considérer que chaque token est unique.
+* **date** : date de génération de la transition
+* **sketch** : chaîne de caractères donnant le nom de l'image du sketch sauvegardé dans le répertoire `static/output_images/`
+* **begin_img** : nom de l'image servant de point de départ à la transition (dans le répertoire `static/utilitaries_images/`)
+* **end_img** : nom de l'image servant de point d'arrivé à la transition (dans le répertoire `static/utilitaries_images`)
 
 **Attention** Tout changement dans le fichier "models.py" doit être effectué avec précaution. Tout changement doit être suivi d'une migration avec les étapes suivantes
 

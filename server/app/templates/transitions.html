@@ -18,12 +18,12 @@
 </div>
 
 <div id="end_image_holder">
-	<img src="static/utilitaries_images/transition_end.jpg" style="width: 5%; height: 5%; margin-left: 38%" />
+	<img src="static/utilitaries_images/{{dict_transition.end_img}}.jpg" style="width: 5%; height: 5%; margin-left: 38%" />
 </div>
 
 <div id="charts" class="container" style="width:100%; height:auto; display: flex;justify-content: space-between; padding-left:0; padding-right:0;">
 	<div id="choice_background" style="width:7.5%; float: left"></div>
-	<div id="canvasDivId" style="width:256px; height: 256px; float: left; border: 1px solid #888888"></div>
+	<div id="canvasDivId" style="width:256px; height: 256px; float: left; border: 1px solid #888888" onload="draw()"></div>
 	<div id="submission" style="width:10%; height:auto; margin-left:2.5%; margin-right:2.5%;display:flex;flex-direction:column;justify-content:center">
 		<div style="width:40%;margin-left:30%; margin-right:30%"><i class="fa fa-long-arrow-right" style="font-size:3.5vw;color:#d9534f"></i></div>
 		<button id="create_transition_button" class="btn btn-danger btn-lg" type="submit" style="width:100%;padding: 10% 0% ;float:left;margin-top:10%;margin-bottom:10%">
@@ -32,25 +32,25 @@
 		<img id="spinning_wheel" src="static/utilitaries_images/spinning.gif" style="width:40%; margin-left:30%; margin-right:30%;visibility:hidden">
 	</div>
 	<div id="result" style="width:256px; height: 256px; float:right">
-		<img id="result_image" src="static/output_images/{{dict_transfer.token}}.jpg" style="width:256px; height: 256px;height:auto">
+		<img id="result_image" src="static/transition_files/output_gifs/{{dict_transition.token}}.gif" style="width:256px; height: 256px;height:auto">
 	</div>
 	<div id="output_options" style="width:5%; float: left; margin-left:2.5%;display:flex;flex-direction:column;justify-content:space-evenly">
-		<button id="" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;padding: 0% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:hidden"{% endif %}>
+		<button id="" class="btn btn-warning btn-lg" {% if dict_transition.token=="placeholder_sq" %}style="width:100%;padding: 0% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:hidden"{% endif %}>
 			<div class="button_submission"><i class="fa fa-download" aria-hidden="true"></i></div>
 		</button>
-		<a id="download_link" href="static/output_images/{{dict_transfer.token}}.jpg" download>
-			<button id="download_button" class="btn btn-primary btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;padding: 20% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:visible;"{% endif %}>
+		<a id="download_link" href="static/transition_files/output_gifs/{{dict_transition.token}}.gif" download>
+			<button id="download_button" class="btn btn-primary btn-lg" {% if dict_transition.token=="placeholder_sq" %}style="width:100%;padding: 20% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:visible;"{% endif %}>
 				<div class="button_submission"><i class="fa fa-download" aria-hidden="true"></i></div>
 			</button>
 		</a>
-		<button id="" class="btn btn-warning btn-lg" {% if dict_transfer.token=="placeholder" %}style="width:100%;padding: 0% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:hidden"{% endif %}>
+		<button id="" class="btn btn-warning btn-lg" {% if dict_transition.token=="placeholder_sq" %}style="width:100%;padding: 0% 0%;visibility:hidden;"{% else %}style="width:100%;padding: 20% 0% ;visibility:hidden"{% endif %}>
 			<div class="button_submission"><i class="fa fa-download" aria-hidden="true"></i></div>
 		</button>
 	</div>
 </div>
 
 <div id="begin_image_holder">
-	<img src="static/utilitaries_images/transition_begin.jpg" style="width: 5%; height: 5%; margin-left: 11%" />
+	<img src="static/utilitaries_images/{{dict_transition.begin_img}}.jpg" style="width: 5%; height: 5%; margin-left: 11%" />
 </div>
 
 <div id="background" class="container" style="width:100%; margin-top:2%;margin-bottom:2%;">
@@ -114,4 +114,32 @@
 
 <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/styles.css')}}">
 <script src="{{url_for('static', filename='scripts/canvas_module.js')}}"></script>
+{% if dict_transition.token != "placeholder_sq" %}
+
+	<script type="text/javascript">
+
+		$(document).ready( 
+			function() {
+				canvas = document.getElementById('canvasId');
+				ctx = canvas.getContext("2d");
+				img = new Image();
+				img.src = "{{url_for('static', filename='transition_files/input_sketches/' + dict_transition.sketch + '.png')}}";
+
+				// The timeout is the less ugly way found to display the sketch. Else, the draw function 
+				// would be run before the page could actually display the sketch
+				setTimeout(draw, 500);
+
+			}
+		)
+
+		function draw() {
+				ctx.drawImage(img, 0, 0, canvas.width, canvas.height);	
+			
+		}
+		
+
+
+	</script>
+
+{% endif %}
 {% endblock %}
