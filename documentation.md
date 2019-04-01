@@ -677,6 +677,8 @@ L'application doit alors pouvoir être accédée.
 
 Le serveur utilise la version de l'application présente sur GitHub. Le serveur tourne à partir de la branche master. Voici les étapes nécessaires à la mise à jour du serveur à la suite d'une modification du repository GitHub.
 
+**Attention** Actuellement, pour des raisons de permissions, les dossiers au sein du dossier `serveur` doivent être créés par l'utilisateur `guillaume`. Sinon, il n'y aura pas les bonnes permissions en écriture pour le serveur (notamment au niveau du contenu de `static`). Par la suite, il faudra veiller à reconfigurer les utilisateurs et NGinx/Gunicorn pour que l'utilisateur émulé pour accéder aux fichiers aient les bons droits en lecture/écriture.
+
 ### 1. Se connecter en SSH en tant qu'utilisateur au serveur
 
 ### 2. Se rendre dans le dossier "home/guillaume/gan4vis"
