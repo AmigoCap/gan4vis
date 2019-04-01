@@ -109,13 +109,13 @@ Nous allons à présent détailler le processus à l'oeuvre lors de l'utilisatio
   </tr>
   <tr>
     <td>4</td>
-    <td>Une fonction "treatment" présente dans le fichier "routes.py" est alors en charge du transfert de style, un token est défini correspondant à l'opération. La fonction appelle une fonction présente dans "neural_style.py" qui sauvegarde l'image de sortie en la nommant à l'aide du token.
-    <td>-</td>
+    <td>Une fonction "treatment" présente dans le fichier "routes.py" est alors en charge du transfert de style, un token est défini correspondant à l'opération. La fonction appelle une fonction présente dans "gan/neural_style.py" qui sauvegarde l'image de sortie en la nommant à l'aide du token.
+    <td>Une fonction "treatment_transitions" présente dans le fichier "routes.py" est alors en charge du transfert de style, un token est défini correspondant à l'opération. La fonction appelle une fonction présente dans "gan/transition.py" qui sauvegarde l'image de sortie en la nommant à l'aide du token.</td>
   </tr>
   <tr>
     <td>5</td>
-    <td>Les paramètres d'entée et de sortie du transfert sont sauvegardés dans la base de données grâce au fichier "models.py" en utilisant le token défini précédemment.</td>
-    <td>-</td>
+    <td>Les paramètres d'entrée et de sortie du transfert sont sauvegardés dans la base de données grâce au fichier "models.py" en utilisant le token défini précédemment.</td>
+    <td>Sont sauvegardés dans la base de données (dans une table à part), l'image du tracé de l'utilisateur, le nom de l'image d'arrivée, le nom de l'image de sortie et le chemin vers le GIF généré.</td>
   </tr>
   <tr>
     <td>6</td>
