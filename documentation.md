@@ -83,9 +83,9 @@ Les colonnes de cette table permettent également de garder une trace de toutes 
 <img src="server/app/static/utilitaries_images/database_transition.png" width="100%">
 </p>
 
-* **token** : Identifiant unique généré automatiquement associé à une transition. Cet identifiant permet de nommer l'image et est intégré à l'URL afin de pouvoir partager et recherger un transfert de style. Bien que la génération du token soit basée sur la même méthode que pour l'autre table (Universally Unique IDentifier, UUID) la probabilité de collision de la méthode est tellement faible que l'on peut considérer que chaque token est unique.
+* **token** : Identifiant unique généré automatiquement associé à une transition. Cet identifiant permet de nommer l'image et est intégré à l'URL afin de pouvoir partager et recharger une transition. Les GIFs générés sont stockés dans le répertoire `static/transition_files/output_gifs/`. Bien que la génération du token soit basée sur la même méthode que pour l'autre table (Universally Unique IDentifier, UUID) la probabilité de collision de la méthode est tellement faible que l'on peut considérer que chaque token est unique.
 * **date** : date de génération de la transition
-* **sketch** : chaîne de caractères donnant le nom de l'image du sketch sauvegardé dans le répertoire `static/output_images/`
+* **sketch** : chaîne de caractères donnant le nom de l'image du sketch sauvegardé dans le répertoire `static/transition_files/input_sketches/`
 * **begin_img** : nom de l'image servant de point de départ à la transition (dans le répertoire `static/utilitaries_images/`)
 * **end_img** : nom de l'image servant de point d'arrivé à la transition (dans le répertoire `static/utilitaries_images`)
 
