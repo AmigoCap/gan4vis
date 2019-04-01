@@ -26,7 +26,7 @@ Nous détaillons dans cette partie les aspects importants de l'application. Nous
 
 ## Structure
 
-Le [site](https://gan4vis.net) actuel est constitué de quatre pages web. 
+Le [site](https://gan4vis.net) actuel est constitué de quatre pages web.
 
 * [/index](https://gan4vis.net/index) : accueil accessible à [https://gan4vis.net](https://gan4vis.net) permettant d'effectuer le transfert de style.
 * [/process](https://gan4vis.net/process) : page accessible depuis l'accueil détaillant le processus de création de la plateforme
@@ -39,7 +39,7 @@ L'application permettant de gérer ce site a une structure MVT (Model View Templ
 <img src="server/app/static/utilitaries_images/structure.png" width="75%">
 </p>
 
-Sur le schéma précédent, les templates sont en bleu. En blanc se trouvent les View (routes.py) et les Model (models.py). Un fichier python appelé neural_style.py permet le chargement et l'application des modèles de transfert de style utilisés.
+Sur le schéma précédent, les Templates sont en bleu. En blanc se trouvent les Views (routes.py) et les Models (models.py). Un fichier python appelé neural_style.py permet le chargement et l'application des modèles de transfert de style utilisés.
 
 ## Données
 
@@ -70,7 +70,7 @@ Nous avons opté pour une base SQLite pour enregistrer les configurations des tr
 * **orientation** : orientation de la figure
 * **ratio** : niveau de zoom décidé par l'utilisateur
 
-**Attention** Tout changement dans le fichier "models.py" doit être effectué avec précaution. Tout changement doit être suivi d'une migration avec les étapes suivantes 
+**Attention** Tout changement dans le fichier "models.py" doit être effectué avec précaution. Tout changement doit être suivi d'une migration avec les étapes suivantes
 
 ```console
 $ flask db migrate
@@ -83,7 +83,7 @@ Des modifications importantes pourront nécessiter une adaptation des données p
 
 Nous allons à présent détailler le processus à l'oeuvre lors de l'utilisation de chacune des pages web. Nous détaillerons plus particulièrement les opérations liées au transfert de style et à la transition.
 
-### Transfert et transition 
+### Transfert et transition
 
 <p align="center">
 <img src="server/app/static/utilitaries_images/structure_process.png" width="75%">
@@ -109,7 +109,7 @@ Nous allons à présent détailler le processus à l'oeuvre lors de l'utilisatio
   </tr>
   <tr>
     <td>4</td>
-    <td>Une fonction "treatment" présente dans le fichier "routes.py" est alors en charge du transfert de style, un token est défini correspondant à l'opération. La fonction appelle une fonction présente dans "neural_style.py" qui sauvegarde l'image de sortie en la nommant à l'aide du token. 
+    <td>Une fonction "treatment" présente dans le fichier "routes.py" est alors en charge du transfert de style, un token est défini correspondant à l'opération. La fonction appelle une fonction présente dans "neural_style.py" qui sauvegarde l'image de sortie en la nommant à l'aide du token.
     <td>-</td>
   </tr>
   <tr>
@@ -148,7 +148,7 @@ Cette route est la fonction déclenchée sur le serveur à chaque fois qu'un uti
 * https://gan4vis.net/index : token = None
 * https://gan4vis.net/index?token=558af5eb-db76-4f7f-b500-536d123f3b30 : token = 558af5eb-db76-4f7f-b500-536d123f3b30
 
-Par la suite, un dictionaire est initialisé dans la route en fonction de la présence d'information sur le token. Si le token est spécifié, une configuration lui correspondant sera cherchée dans la base de donnée. Sinon une configuration par défaut sera utilisée. Enfin, les codes html et javascript utilisés sur le client on été adaptés afin de fonctionner dans les deux cas. 
+Par la suite, un dictionaire est initialisé dans la route en fonction de la présence d'information sur le token. Si le token est spécifié, une configuration lui correspondant sera cherchée dans la base de donnée. Sinon une configuration par défaut sera utilisée. Enfin, les codes html et javascript utilisés sur le client on été adaptés afin de fonctionner dans les deux cas.
 
 ## Travailler en local avec l'application
 
@@ -198,15 +198,15 @@ Le fichier `nom_modele.pth` doit être placé dans le dossier `gan4vis/server/ap
 
 **Image de style**
 
-Dans la fonction `treatment()` présente dans `gan4vis/server/app/routes.py` , l'image de style est affectée en image de font lors d'un transfert de style. Nous avons donc besoin de rendre disponible l'image de style. Pour cela sauvegarder l'image de style sous forme `nom_modele.jpg` dans le dossier `gan4vis/server/app/static/style-images`, où `nom_modele` correspond au nom du fichier `.pth` chargé plus haut, sans l'extension. 
+Dans la fonction `treatment()` présente dans `gan4vis/server/app/routes.py` , l'image de style est affectée en image de font lors d'un transfert de style. Nous avons donc besoin de rendre disponible l'image de style. Pour cela sauvegarder l'image de style sous forme `nom_modele.jpg` dans le dossier `gan4vis/server/app/static/style-images`, où `nom_modele` correspond au nom du fichier `.pth` chargé plus haut, sans l'extension.
 
 **Image d'affichage**
 
-Sur l'interface, l'image de style est présentée en choix. Une image d'affichage est pour cela nécessaire. Cette image correspond à une version carré, à qualité réduite de l'image de style. L'image d'affichage doit être placée dans `gan4vis/server/app/static/utilitaries_images` sous la forme `nom_modele.jpg`, où `nom_modele` correspond au nom du fichier `.pth` chargé plus haut, sans l'extension. 
+Sur l'interface, l'image de style est présentée en choix. Une image d'affichage est pour cela nécessaire. Cette image correspond à une version carré, à qualité réduite de l'image de style. L'image d'affichage doit être placée dans `gan4vis/server/app/static/utilitaries_images` sous la forme `nom_modele.jpg`, où `nom_modele` correspond au nom du fichier `.pth` chargé plus haut, sans l'extension.
 
 ### 2. Connecter le serveur au modèle
 
-Le fichier `gan4vis/server/app/gan/neural_style.py` est le fichier chargeant les modèles et réalisant le transfert de style. Au début du script, les modèles sont chargés au démarrage du serveur. C'est là que nous avons besoin d'effectuer une modification. Ajouter au dictionnaire existant une nouvelle clé correspondant au nom du fichier `.pth` avec extension. Y affecter une valeur `None` 
+Le fichier `gan4vis/server/app/gan/neural_style.py` est le fichier chargeant les modèles et réalisant le transfert de style. Au début du script, les modèles sont chargés au démarrage du serveur. C'est là que nous avons besoin d'effectuer une modification. Ajouter au dictionnaire existant une nouvelle clé correspondant au nom du fichier `.pth` avec extension. Y affecter une valeur `None`
 
 ```python
 # Create dictionary storing the models
@@ -220,7 +220,7 @@ Au niveau de l'interface, la selection d'un modèle se fait par clic de l'utilis
 
 **processing_index.js**
 
-Aucun changement n'est à effectuer sur `processing_index.js`, nous expliquons juste ici comment est géré un modèle sur l'interface. `processing_index.js` gère les intéractions sur la page d'accueil et est en charge de l'envoi de la requête AJAX au serveur. Cette requête contient entre autres le nom du modèle à utiliser. La récupération du modèle utilisé est permise par le morceau de code suivant : 
+Aucun changement n'est à effectuer sur `processing_index.js`, nous expliquons juste ici comment est géré un modèle sur l'interface. `processing_index.js` gère les intéractions sur la page d'accueil et est en charge de l'envoi de la requête AJAX au serveur. Cette requête contient entre autres le nom du modèle à utiliser. La récupération du modèle utilisé est permise par le morceau de code suivant :
 
 ```javascript
 var image_click = function(image){
@@ -234,7 +234,7 @@ Les deux premières lignes sont en charge de modifier l'aspect de l'image sélec
 
 **index.html**
 
-Le fichier `index.html` permet de gérer l'affichage de la page d'accueil. Le morceau suivant est en charge de l'affichage des modèles. Complèter comme ci-dessous un des blocks affichant un modèle. 
+Le fichier `index.html` permet de gérer l'affichage de la page d'accueil. Le morceau suivant est en charge de l'affichage des modèles. Complèter comme ci-dessous un des blocks affichant un modèle.
 
 ```html
 <div id="interface_gans" style="width:35%; float: right; height:30%;margin-left:7.5%;margin-right:7.5%">
@@ -261,9 +261,9 @@ Ces étapes terminées le modèle devrait être utilisable depuis l'interface.
 
 # Serveur
 
-À fin mars 2019 le serveur à la configuration suivante : 
+À fin mars 2019 le serveur à la configuration suivante :
 
-* 8 GB Memory 
+* 8 GB Memory
 * 160 GB Disk
 * Ubuntu 18.04.1 x64
 
@@ -279,7 +279,7 @@ Les ressources nécessaires à la création d'un utilisateur et à l'administrat
 * [Initial Server Setup with Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04)
 * [How to Set Up SSH Keys on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804)
 
-L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent pas correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons ci-dessous succintement les étapes nécessaires à la création d'un nouvel utilisateur. Il est conseillé de faire les étapes suivantes en root. 
+L'accès au serveur se fait par SSH. Nous déconseillons très fortement d'utiliser la console de l'hébergeur depuis un navigateur car les copier-collers fonctionnent mal et toutes les touches du clavier n'y fonctionnent pas correctement. Depuis une console et avec un accès SSH, il est possible de se connecter en mode root `ssh root@ip-server` ou utilisateur `ssh utilisateur@ip-server`. Nous résumons ci-dessous succintement les étapes nécessaires à la création d'un nouvel utilisateur. Il est conseillé de faire les étapes suivantes en root.
 
 ### 0. Activer le firewall
 
@@ -298,7 +298,7 @@ Créons à présent l'utilisateur.
 # adduser utilisateur
 ```
 
-Entrer alors les informations requises ainsi que son mot de passe. 
+Entrer alors les informations requises ainsi que son mot de passe.
 
 ### 2. Donner l'accès root à l'utilisateur
 
@@ -306,7 +306,7 @@ Entrer alors les informations requises ainsi que son mot de passe.
 # usermod -aG sudo utilisateur
 ```
 
-### 3. Configurer le SSH du nouvel utilisateur pour l'accès root 
+### 3. Configurer le SSH du nouvel utilisateur pour l'accès root
 
 Ouvrir le fichier "~/.ssh/authorized_keys" du root :
 
@@ -316,7 +316,7 @@ Ouvrir le fichier "~/.ssh/authorized_keys" du root :
 
 Puis y ajouter la clé ssh de l'utilisateur. Cette suite d'étape terminée, vérifier que l'utilisateur arrive bien à se connecter en root.
 
-### 4. Configurer le SSH du nouvel utilisateur pour accès utilisateur 
+### 4. Configurer le SSH du nouvel utilisateur pour accès utilisateur
 
 La configuration se fait automatiquement sur demande de l'utilisateur. Il lui suffit d'ouvrir une session dans sa console et de rentrer la ligne suivante. Il aura alors à rentrer le mot de passe root.
 
@@ -328,12 +328,12 @@ Une fois l'opération terminée, l'utilisateur pourra se connecter normalement a
 
 ## NGINX
 
-Maintenant qu'un utilisateur tout puissant est configuré, nous allons pouvoir créer l'application. 
+Maintenant qu'un utilisateur tout puissant est configuré, nous allons pouvoir créer l'application.
 
 Les ressources utilisées sont disponibles ici :
 * [How To Install Nginx on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04)
 
-[NGINX](https://fr.wikipedia.org/wiki/NGINX) est la première couche sur laquelle est assise l'application. NGINX permet entre autres la gestion des requêtes. Nous détaillons ci-dessous les étapes nécessaires au paramétrage de NGINX sur une machine Ubuntu 18.04.1. 
+[NGINX](https://fr.wikipedia.org/wiki/NGINX) est la première couche sur laquelle est assise l'application. NGINX permet entre autres la gestion des requêtes. Nous détaillons ci-dessous les étapes nécessaires au paramétrage de NGINX sur une machine Ubuntu 18.04.1.
 
 En pré-requis de cette étape, nous considérons que :
 *Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
@@ -379,7 +379,7 @@ Vérifier que tout fonctionne bien :
 ```console
 $ systemctl status nginx
 ```
-La sortie doit montrer l'activation du serveur : 
+La sortie doit montrer l'activation du serveur :
 
 ```console
 Output
@@ -396,10 +396,10 @@ nginx.service - A high performance web server and a reverse proxy server
 
 ## Python, Gunicorn & Flask
 
-L'ensemble des ressources utilisées se trouvent au lien suivant : 
+L'ensemble des ressources utilisées se trouvent au lien suivant :
 * [How To Serve Flask Applications with Gunicorn and Nginx on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04)
 
-Cette étape permet la configuration des seconde et troisième couches de l'application. La seconde couche consiste en [Gunicorn](https://fr.wikipedia.org/wiki/Gunicorn) qui est un serveur web HTTP WSGI. La troisième couche correspond au serveur Flask. 
+Cette étape permet la configuration des seconde et troisième couches de l'application. La seconde couche consiste en [Gunicorn](https://fr.wikipedia.org/wiki/Gunicorn) qui est un serveur web HTTP WSGI. La troisième couche correspond au serveur Flask.
 
 En pré-requis de cette étape, nous considérons que :
 * Un utilisateur disposant des droits administrateur connaissant le mot de passe root est configuré et exécute ces étapes.
@@ -416,7 +416,7 @@ $ sudo apt install python3-pip python3-dev build-essential libssl-dev libffi-dev
 
 ### 2. Création du dossier du serveur
 
-Avant d'aller plus loin, faisons un point sur la structure actuelle des dossiers de la machine. L'entrée de la commande `pwd` doit vous donner l'affichage suivant : 
+Avant d'aller plus loin, faisons un point sur la structure actuelle des dossiers de la machine. L'entrée de la commande `pwd` doit vous donner l'affichage suivant :
 
 ```console
 └── home
@@ -477,7 +477,7 @@ Commençons à installer les modules. Tout d'abord, installer wheel.
 $ pip install wheel
 ```
 
-Installer ensuite l'ensemble des modules utilisés par l'application. Pour cela utiliser le fichier `gan4vis/server/requirements.txt` : 
+Installer ensuite l'ensemble des modules utilisés par l'application. Pour cela utiliser le fichier `gan4vis/server/requirements.txt` :
 
 ```console
 $ pip install -r requirements.txt
@@ -489,7 +489,7 @@ Par expérience l'installation de PyTorch peut être délicate. Nous décidons d
 <img src="server/app/static/utilitaries_images/configuration_pytorch.png" width="80%">
 </p>
 
-Nous installons donc PyTorch de la manière suivante, d'après les informations fournies par le site de PyTorch : 
+Nous installons donc PyTorch de la manière suivante, d'après les informations fournies par le site de PyTorch :
 
 ```console
 $ pip install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp36-cp36m-linux_x86_64.whl
@@ -516,7 +516,7 @@ $ flask db upgrade
 
 ### 5. Configurer Gunicorn et lancer le serveur
 
-Avant d'aller plus loin, nous allons vérifier que toutes les étapes précédentes se sont bien passées en simulant un fonctionnement de l'application. Autoriser tout dabord le pare-feu pour le port 5000 : 
+Avant d'aller plus loin, nous allons vérifier que toutes les étapes précédentes se sont bien passées en simulant un fonctionnement de l'application. Autoriser tout dabord le pare-feu pour le port 5000 :
 
 ```console
 $ sudo ufw allow 5000
@@ -558,7 +558,7 @@ ExecStart=/home/utilisateur/gan4vis/server/gan4vis_env/bin/gunicorn --workers 3 
 WantedBy=multi-user.target
 ```
 
-Entrer ensuite la série de commandes suivante : 
+Entrer ensuite la série de commandes suivante :
 
 ```console
 $ sudo systemctl start server
@@ -581,7 +581,7 @@ La sortie doit alors montrer que le serveur est actif. Le message doit ressemble
            └─10583 /home/guillaume/gan4vis/server/gan4vis_env/bin/python3.6 /home/guillaume/gan4vis/server/gan4vis_env/bi
 
 Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 systemd[1]: Started Gunicorn instance to serve server.
-Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:27 +0000] [10564] [INFO] Starting gunicorn 
+Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:27 +0000] [10564] [INFO] Starting gunicorn
 Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:27 +0000] [10564] [INFO] Listening at: unix
 Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:27 +0000] [10564] [INFO] Using worker: sync
 Mar 29 14:23:27 ubuntu-s-1vcpu-1gb-ams3-01 gunicorn[10564]: [2019-03-29 14:23:27 +0000] [10580] [INFO] Booting worker wit
@@ -623,7 +623,7 @@ Désactiver ensuite la permission du pare-feu sur le port 5000.
 $ sudo ufw delete allow 5000
 ```
 
-Permettre 'Nginx Full' pour le pare-feu : 
+Permettre 'Nginx Full' pour le pare-feu :
 
 ```console
 $ sudo ufw allow 'Nginx Full'
@@ -658,7 +658,7 @@ L'application doit alors pouvoir être accédée.
 
 Le serveur utilise la version de l'application présente sur GitHub. Le serveur tourne à partir de la branche master. Voici les étapes nécessaires à la mise à jour du serveur à la suite d'une modification du repository GitHub.
 
-### 1. Se connecter en SSH en tant qu'utilisateur au serveur 
+### 1. Se connecter en SSH en tant qu'utilisateur au serveur
 
 ### 2. Se rendre dans le dossier "home/guillaume/gan4vis"
 
@@ -668,18 +668,18 @@ Le serveur utilise la version de l'application présente sur GitHub. Le serveur 
 $ git pull origin master
 ```
 
-### 4. Relancer Gunicorn 
+### 4. Relancer Gunicorn
 
 ```console
 $ sudo systemctl restart server
 $ sudo systemctl enable server
-$ sudo systemctl status server 
+$ sudo systemctl status server
 ```
 
 ### 5. Relancer NGINX
 
 ```console
-$ sudo systemctl restart nginx 
+$ sudo systemctl restart nginx
 ```
 
 Le serveur est alors à jour et peut être accédé normalement par URL.
